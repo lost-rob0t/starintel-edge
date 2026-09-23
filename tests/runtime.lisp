@@ -31,4 +31,4 @@
                  :backend (lambda (&rest args) (declare (ignore args)) :forwarded)
                  :capabilities (lambda () '("location.read")))))
       (check (eq :denied (getf (star.edge.host:call-host host "dispatch" nil "location.read") :status))))
-  (format t "~D Common Lisp host contract checks passed.~%" checks))
+    (format t "~D Common Lisp host contract checks passed.~%" checks)))
