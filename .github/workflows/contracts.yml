@@ -1,0 +1,25 @@
+name: Edge host contracts
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install contract test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes sbcl kotlin
+      - name: Target and ownership metadata
+        run: python3 tools/check_contracts.py
+      - name: Common Lisp forwarding and deny-by-default contract
+        run: sbcl --script tests/runtime.lisp
+      - name: Compile and test JVM facades (not Android or device coverage)
+        run: |
+          mkdir -p build
+          kotlinc platforms/android/EdgeHost.kt platforms/watch/WatchHost.kt platforms/glasses/GlassesHosts.kt tests/HostContractTest.kt -include-runtime -d build/host-tests.jar
+          java -jar build/host-tests.jar

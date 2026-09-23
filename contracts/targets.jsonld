@@ -1,0 +1,17 @@
+{
+  "@context": {"@vocab": "urn:starintel:edge:"},
+  "@id": "urn:starintel:edge:target-catalog:1",
+  "@type": "TargetCatalog",
+  "contractVersion": 1,
+  "canonicalSource": "https://github.com/lost-rob0t/starintel-edge",
+  "targets": [
+    {"id":"rpi","path":"platforms/rpi","execution":"native","backend":"Common Lisp / SBCL","status":"scaffold","gates":["aarch64-build","board-boot","offline-runtime","reboot-recovery"]},
+    {"id":"android","path":"platforms/android","execution":"native","backend":"Common Lisp / ABCL","status":"scaffold","gates":["apk-build","android-art-abcl","offline-runtime","process-death","permission-revocation"]},
+    {"id":"wearos","path":"platforms/watch","execution":"native","backend":"Common Lisp / ABCL","status":"scaffold","gates":["watch-apk-build","watch-art-abcl","phone-disconnected","battery-thermal","process-death"]},
+    {"id":"android-glasses","path":"platforms/glasses","execution":"native","backend":"Common Lisp / ABCL where installable","status":"scaffold","gates":["vendor-installability","device-art-abcl","sdk-conformance","permission-revocation"]},
+    {"id":"xreal","path":"platforms/glasses","execution":"companion","backend":"Phone or supported compute host","status":"scaffold","gates":["exact-device-sdk","display-input","disconnect-recovery"]},
+    {"id":"viture","path":"platforms/glasses","execution":"companion","backend":"Phone or supported compute host","status":"scaffold","gates":["exact-device-sdk","display-input","disconnect-recovery"]},
+    {"id":"vuzix-realwear","path":"platforms/glasses","execution":"native","backend":"Android host only on verified installable models","status":"scaffold","gates":["vendor-installability","device-art-abcl","sdk-conformance"]},
+    {"id":"meta","path":"platforms/glasses","execution":"companion","backend":"Android + official Meta Wearables DAT","status":"scaffold","gates":["sdk-build","registration-permissions","camera-session","model-specific-display","disconnect-revocation","physical-device"]}
+  ]
+}

@@ -1,0 +1,14 @@
+/build/
+*.fasl
+*.abcl
+*.jar
+*.apk
+*.aab
+*.aar
+.gradle/
+local.properties
+.env
+.env.*
+__pycache__/
+result
+result-*
