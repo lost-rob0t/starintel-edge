@@ -18,6 +18,22 @@ repository; they must not maintain independent copies of edge runtime behavior.
 - `starintel-biz`, infrastructure, `starintel-universe`, Android/Wear OS products,
   and ROM overlays pull versioned artifacts or exact source revisions from here.
 
+See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
+[downstream consumption contract](downstream/README.md).
+
+## Source layout
+
+| Path | Responsibility |
+| --- | --- |
+| `runtime/` | Shared Common Lisp host contract and reusable runtime integration |
+| `platforms/rpi/` | Linux/Raspberry Pi host and generic Nix/board packaging |
+| `platforms/android/` | Android runtime host and platform bridge |
+| `platforms/glasses/` | Native and companion glasses hosts, including Meta |
+| `platforms/watch/` | Wear OS lightweight local host and optional relay integration |
+| `contracts/` | Local JSON-LD target catalog and acceptance gates |
+| `tests/` | Common host and platform-facade conformance checks |
+| `downstream/` | Pinning, source migration, release and consumer rules |
+
 ## Target families
 
 | Target | Execution model | Initial acceptance gate |
@@ -37,10 +53,25 @@ SDK-dependent, not a blanket promise for all glasses.
 
 ## Bootstrap status
 
-Repository authority and platform scope are established. Runtime foundation,
-conformance tests, platform bridges, and downstream integration are being added
-as reviewable changes. No APK, Raspberry Pi image, vendor hardware certification,
-or production-ready distributed runtime is claimed by this initial commit.
+Implemented in this foundation: a Common Lisp forwarding/admission contract,
+typed Kotlin Android/watch/glasses facades, eight scaffold target-family records,
+contract tests and CI, and Nix packaging for the contract library. Missing runtime
+backends explicitly report unavailable; they do not simulate working devices.
+
+**Not implemented by this bootstrap:** actual actor-runtime extraction, ABCL/ART
+integration, Android or watch APKs, vendor SDK bindings, Raspberry Pi boot images,
+durable outbox, P2P runtime, or downstream migrations. Desktop JVM/contract tests
+are not hardware, Android, watch, or Meta integration tests.
+
+| Remaining work | Tracking |
+| --- | --- |
+| Common Lisp runtime extraction and Raspberry Pi/Nix host | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
+| Android local ABCL runtime library and diagnostic APK | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
+| Smart-glasses adapters and official Meta DAT integration | [#4](https://github.com/lost-rob0t/starintel-edge/issues/4) |
+| Wear OS local runtime, offline mode and optional relay | [#5](https://github.com/lost-rob0t/starintel-edge/issues/5) |
+| Pinned downstream artifacts, migration and release/promotion | [#6](https://github.com/lost-rob0t/starintel-edge/issues/6) |
+
+[Implementation roadmap and test commands](docs/ROADMAP.md).
 
 ## Integration rules
 
