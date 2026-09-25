@@ -1,0 +1,52 @@
+* Run identity
+- Consumed issue :: #2
+- Branch :: =rage/2-lisp-runtime-rpi-host=
+- RAGE start commit :: =83e5e21de8e607adb0aa675ea0e5434afd00a347=
+
+* Mode selection
+- Control plane :: none defined in this repository (no research/design/approval location or workflow exists; AGENTS.md is silent)
+- Selected by :: user explicitly invoked =/auto-rage=
+- Mode :: Auto-RAGE — worker runs the full ADADR loop and records its own software-design decision
+
+* Analyze — research evidence (subagent-verified)
+- Extraction source :: =starintel-server@f8e20c0b5629a34580c937a5e9ec56834e324802= (origin =ssh://forgejo@git.starintel.actor/starintel-labs/starintel-server.git=)
+- License :: GPL-3.0-or-later (verbatim GPLv3 LICENSE, (C) 2024 nsaspy; declared in every .asd)
+- Actor engine :: Sento (cl-gserver pinned =github-6a510c5b58469e72e6363bd3a6059d80b9a5c320=); no custom supervisor/restart-strategy exists server-side — supervision is Sento's
+- Reusable upstream set :: =source/actors.lisp= (actor-system bootstrap, actor-index agent, define-actor hook, pinned-agent fail-fast publish), =source/runtime-lifecycle.lisp= =star.runtime= layer (rollback-on-partial-failure start, dependency-safe idempotent stop, SIGTERM/SIGINT, bounded consumer stop), =source/consumers/retry-policy.lisp= (error taxonomy), wheel-timer scheduling
+- Server-only, NOT extracted :: CouchDB/Rabbit storage+ingest, HTTP frontends, auth, valkey lease store, dead user-finder/user-hunt actors
+- Gaps that must be NEW upstream code (server has nothing) :: power policy, P2P/i2pd, update client, file-backed bounded outbox (server outbox is CouchDB-coupled), Linux host backend
+- Host capability (this machine, probed) :: flakes OK; =sbclPackages.sento= OK; native x86_64 build OK; aarch64 + NixOS module eval (both arch) OK; aarch64 cached/cross build OK; uncached native aarch64 build NO (no binfmt); no local board image build/boot possible
+- starintel-edge has NO LICENSE file yet → derivative-work exposure once GPL code is adapted
+
+* Design — iteration 1
+** Lisp runtime extraction
+- Keep =starintel-edge= facade system untouched in behavior; add =starintel-edge-runtime= system =:depends-on (sento bordeaux-threads)=; =:license "GPL-3.0-or-later"= (derivative of starintel-server).
+- =runtime/runtime-package.lisp= package =star.edge.runtime=.
+- =runtime/actors.lisp= — adapted from server =actors.lisp=: pinned-dispatcher actor system, actor-index agent (register/resolve/route), =define-actor= hook (plain list, drops nhooks dep), bounded fail-fast publish to an injected sink port (Rabbit is server-only here).
+- =runtime/lifecycle.lisp= — adapted from server =star.runtime= layer: managed components, start with rollback on partial failure, dependency-safe idempotent stop, SIGTERM/SIGINT, run loop.
+- =runtime/outbox.lisp= — NEW bounded durable outbox: append+fsync journal, refuse-when-full, explicit purge, recovery of unacked entries (crash/reboot).
+- =runtime/power.lisp= — NEW capability-honest power policy over caller-supplied power state; never fabricates battery data.
+- =runtime/linux.lisp= — NEW real Linux backend for platform "linux-rpi": wires star.edge.host ports to the runtime; =/sys/class/power_supply= discovery (absent → unavailable); offline startup (no network required).
+- =tests/runtime.lisp= keeps facade checks, adds runtime suites adapted from server =t/runtime-lifecycle-test.lisp= / =t/target-routing-test.lisp= semantics with provenance comments.
+** Nix host
+- =flake.nix= with pinned nixpkgs: =packages.x86_64-linux.starintel-edge= (sbcl.withPackages over sources); checks: lisp-tests (runs the suite), contract-check, NixOS evals x86_64 + aarch64 rpi4/rpi5; aarch64 package via cross/substitute where cache allows.
+- =nixosModules.starintel-edge=: hardened systemd service (StateDirectory, SIGTERM graceful stop, Restart, no secret values in config).
+- =profiles/=: =laptop-x86_64.nix= (operator laptop edge OS), =rpi4.nix=, =rpi5.nix= (separate board definitions); eval configurations exposed; sd-image builders exposed but NOT built/claimed (board-boot gate needs hardware).
+** Honesty gates
+- Catalog targets stay =status: scaffold=; no boot/support claims; missing backends unavailable; Python validator untouched.
+
+* Adversarial review
+1. *GPL exposure*: repo had no LICENSE; adapting GPLv3 code makes this a derivative work → add LICENSE (GPL-3.0-or-later) + =:license= in asd. Resolved in scope.
+2. *Copy-only duplicate runtime*: extraction is re-authored =star.edge.*= code with provenance headers; downstream forwarding/retirement recorded as follow-up in docs/PROVENANCE.md (server code retires only after consumer equivalence passes there).
+3. *Platform string stability*: facade accepts only "linux-rpi" for Linux; laptop profile reuses the same Linux runtime backend rather than inventing a new platform string (contract stability).
+4. *Outbox bound policy*: refuse-when-full chosen; drop-oldest silently loses operations. Purge is explicit. fsync before ack; crash-recovery test covers mid-journal kill.
+5. *Power honesty*: policy consumes caller-supplied state; /sys backend returns unavailable without battery; no fabricated values.
+6. *Nix untrusted-user limits*: checks use import-level system overrides (no =--system= flag); aarch64 = eval + cross/substitute; uncached aarch64 builds are NOT attempted locally — recorded, not hidden.
+7. *CI sbcl lacks sento*: workflow must install quicklisp+sento before the Lisp gate; otherwise exact-head CI goes red.
+8. *Signal handlers under --script*: bounded install pattern copied from proven server semantics; safe non-interactively.
+9. *Secrets*: none copied; PROVENANCE records excluded private paths; NixOS module takes no secret values.
+
+* Decision (Auto-RAGE — recorded by worker after adversarial review)
+- Approved scope :: iteration 1 = runtime extraction + real Linux host + bounded outbox + power policy + shutdown/recovery tests + Nix flake/module/profiles (x86_64 laptop, RPi4, RPi5) + LICENSE + PROVENANCE + CI sento fix.
+- Rejected alternatives :: (a) full P2P/i2pd/update-client scope now — unbounded and untestable without hardware; (b) facade-only — fails acceptance "shared host facade bound to real runtime"; (c) extracting Rabbit/CouchDB transport — server-only per ADR 0001 boundary table.
+- Explicitly NOT claimed :: board-boot, image boot evidence, RPi4/5 support, P2P/update-client existence. Catalog stays scaffold.
