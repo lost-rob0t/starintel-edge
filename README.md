@@ -51,21 +51,23 @@ allow. In particular, a companion adapter does not imply that custom runtime cod
 can be installed directly on Meta glasses. Display capabilities are model- and
 SDK-dependent, not a blanket promise for all glasses.
 
-## Bootstrap status
+## Runtime status
 
-Implemented in this foundation: a Common Lisp forwarding/admission contract,
-typed Kotlin Android/watch/glasses facades, eight scaffold target-family records,
-contract tests and CI, and Nix packaging for the contract library. Missing runtime
-backends explicitly report unavailable; they do not simulate working devices.
+Implemented here: the Common Lisp forwarding/admission contract, Sento actor
+supervision, managed lifecycle with startup rollback and graceful shutdown, a
+bounded durable file outbox, a fail-closed power policy, the Linux host adapter,
+typed Kotlin Android/watch/glasses facades, target-family records, and contract
+tests. Missing device backends explicitly report unavailable; they do not
+simulate working devices.
 
-**Not implemented by this bootstrap:** actual actor-runtime extraction, ABCL/ART
-integration, Android or watch APKs, vendor SDK bindings, Raspberry Pi boot images,
-durable outbox, P2P runtime, or downstream migrations. Desktop JVM/contract tests
-are not hardware, Android, watch, or Meta integration tests.
+**Not yet implemented:** Android ECL/ART packaging, Android or watch diagnostic
+APKs, vendor SDK bindings, Raspberry Pi boot images, P2P runtime, or downstream
+migrations. Desktop JVM/contract tests are not Android, board, watch, or Meta
+hardware evidence.
 
 | Remaining work | Tracking |
 | --- | --- |
-| Common Lisp runtime extraction and Raspberry Pi/Nix host | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
+| Raspberry Pi/Nix service and hardware boot evidence | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
 | Android local ABCL runtime library and diagnostic APK | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
 | Smart-glasses adapters and official Meta DAT integration | [#4](https://github.com/lost-rob0t/starintel-edge/issues/4) |
 | Wear OS local runtime, offline mode and optional relay | [#5](https://github.com/lost-rob0t/starintel-edge/issues/5) |
