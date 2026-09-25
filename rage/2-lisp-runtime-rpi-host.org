@@ -50,3 +50,8 @@
 - Approved scope :: iteration 1 = runtime extraction + real Linux host + bounded outbox + power policy + shutdown/recovery tests + Nix flake/module/profiles (x86_64 laptop, RPi4, RPi5) + LICENSE + PROVENANCE + CI sento fix.
 - Rejected alternatives :: (a) full P2P/i2pd/update-client scope now — unbounded and untestable without hardware; (b) facade-only — fails acceptance "shared host facade bound to real runtime"; (c) extracting Rabbit/CouchDB transport — server-only per ADR 0001 boundary table.
 - Explicitly NOT claimed :: board-boot, image boot evidence, RPi4/5 support, P2P/update-client existence. Catalog stays scaffold.
+
+* Concurrency note (recorded, kept visible)
+- A concurrent session committed the working-tree runtime extraction as =1d99cdf feat: add reusable Common Lisp edge runtime= (adding LICENSE and docs/PROVENANCE.md matching the recorded design), then created =feat/android-ecl-runtime= on top and checked it out in the primary checkout.
+- TDD green state (69 checks) was verified on exactly that tree before the commit was observed.
+- RAGE work continues in worktree =~/git/worktrees/starintel-edge-rage-2-nix-host-profiles= on branch =rage/2-nix-host-profiles= (base =feat/android-ecl-runtime=) so the primary checkout stays untouched.
