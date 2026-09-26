@@ -39,7 +39,7 @@ See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
 | Target | Execution model | Initial acceptance gate |
 | --- | --- | --- |
 | Raspberry Pi / Linux SBC | Local Common Lisp host; Nix packaging | Native and ARM boot/runtime tests |
-| Android phone / tablet | Local Common Lisp through the ABCL platform bridge | Android ART startup, lifecycle, offline, permission tests |
+| Android phone / tablet | Local Common Lisp through the reusable ECL/JNI runtime bundle | Android ART startup, lifecycle, offline, permission tests |
 | Android-based glasses | Local host where the vendor permits installation | Per-device install and SDK conformance tests |
 | Tethered/display glasses | Phone/compute-host runtime plus capability adapter | Per-device display/input/transport tests |
 | Meta glasses | Android companion integration through official Wearables Device Access Toolkit | SDK/device/version-specific permission, session, capture and optional display tests |

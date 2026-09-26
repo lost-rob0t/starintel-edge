@@ -266,4 +266,49 @@
                             (merge-pathnames "power_supply/" base)))))
         (uiop:delete-directory-tree base :validate t)))
 
+    ;; --- android adapter backend: process-owned host + closed JSON dispatcher ---
+    (let ((host (star.edge.android:make-android-host)))
+      (check (equal "android" (star.edge.host:host-platform host)))
+      (check (null (star.edge.host:host-capabilities host)))
+      ;; dispatch without an advertised capability is denied, not forwarded
+      (let ((resp (star.edge.host:call-host host "dispatch" nil "power.status")))
+        (check (eq (getf resp :status) :denied))
+        (check (eq (getf resp :reason) :capability-not-authorized))))
+    (check (string= (star.edge.android:encode-json
+                     '(:status :ok :state :running))
+                    "{\"status\":\"ok\",\"state\":\"running\"}"))
+    (check (string= (star.edge.android:encode-json
+                     '(:status :ok :power (:source :battery :percent 42)))
+                    "{\"status\":\"ok\",\"power\":{\"source\":\"battery\",\"percent\":42}}"))
+    (check (string= (star.edge.android:encode-json
+                     (list :reason (format nil "quote\"slash\\tab~Cnewline~C"
+                                           #\tab #\newline)))
+                    "{\"reason\":\"quote\\\"slash\\\\tab\\tnewline\\n\"}"))
+    (check (string= (star.edge.android:encode-json '()) "[]"))
+    ;; uninstalled process host is honestly unavailable, never simulated
+    (star.edge.android:install-adapter-host)
+    (check (string= (star.edge.android:handle-request "runtime.ping" nil nil)
+                    "{\"status\":\"ok\",\"runtime\":\"starintel-edge\",\"adapter-abi\":1,\"platform\":\"android\"}"))
+    (check (string= (star.edge.android:handle-request "actor.roundtrip" nil nil)
+                    "{\"status\":\"ok\",\"actor\":\"roundtrip\",\"message\":\"android-local\"}"))
+    (check (string= (star.edge.android:handle-request "status" nil nil)
+                    "{\"status\":\"unavailable\",\"reason\":\"runtime-not-attached\"}"))
+    (let ((rt (star.edge.runtime:start-runtime nil)))
+      (check (string= (star.edge.android:handle-request "status" nil nil)
+                      "{\"status\":\"ok\",\"state\":\"running\"}"))
+      (check (string= (star.edge.android:handle-request "stop" nil nil)
+                      "{\"status\":\"ok\",\"state\":\"stopped\"}"))
+      ;; closed operation set: eval text is never a runtime operation
+      (check (string= (star.edge.android:handle-request "eval" "(quit)" nil)
+                      "{\"status\":\"error\",\"reason\":\"unknown-operation\"}")))
+    ;; dispatch without an advertised capability is denied, not forwarded
+    (check (string= (star.edge.android:handle-request "dispatch" nil "power.status")
+                    "{\"status\":\"denied\",\"reason\":\"capability-not-authorized\"}"))
+    (let ((host (star.edge.android:make-android-host
+                 :capabilities (lambda () '("power.status"))
+                 :power-state-fn (lambda () '(:source :battery :percent 42)))))
+      (let ((resp (star.edge.host:call-host host "dispatch" nil "power.status")))
+        (check (eq (getf resp :status) :ok))
+        (check (equal (getf resp :power) '(:source :battery :percent 42)))))
+
     (format t "~D Common Lisp host contract and runtime checks passed.~%" checks)))

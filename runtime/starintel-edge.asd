@@ -17,11 +17,12 @@
   :description "Canonical StarIntel edge runtime: Sento actor supervision, managed lifecycle, bounded durable outbox, power policy, Linux host backend"
   :version "0.1.0"
   :license "GPL-3.0-or-later"
-  :depends-on (#:sento #:bordeaux-threads)
+  :depends-on (#:sento #:bordeaux-threads #:starintel-edge)
   :serial t
   :components ((:file "runtime-package")
                (:file "actors")
                (:file "lifecycle")
                (:file "outbox")
                (:file "power")
-               (:file "linux")))
+               (:file "linux")
+               (:file "android")))

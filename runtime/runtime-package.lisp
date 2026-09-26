@@ -62,3 +62,14 @@
   (:export
    #:make-linux-host
    #:read-sys-power-state))
+
+(uiop:define-package #:star.edge.android
+  (:use #:cl)
+  (:import-from #:star.edge.host #:make-host #:host-platform #:call-host)
+  (:import-from #:bordeaux-threads #:make-lock #:with-lock-held)
+  (:export
+   #:make-android-host
+   #:install-adapter-host
+   #:adapter-host
+   #:handle-request
+   #:encode-json))

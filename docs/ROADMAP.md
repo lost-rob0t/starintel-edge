@@ -1,6 +1,6 @@
 # Implementation and evidence gates
 
-The bootstrap implements only a Lisp forwarding/admission contract, JVM-compilable platform facades, a JSON-LD target catalog, documentation and contract tests. The default backend is unavailable. It does not implement the actor engine, ABCL loader, Android service/APK, watch APK, vendor SDK adapter, P2P protocol, durable outbox or Raspberry Pi boot image.
+The repository now contains the canonical Sento actor runtime, managed lifecycle, durable outbox, Linux host backend, and reusable Android ECL/JNI runtime bundle with an Edge-owned diagnostic APK. Product Android services/UI, watch APK, vendor SDK adapters, P2P protocol, and Raspberry Pi boot images remain downstream or future platform work.
 
 ## Workstreams
 
