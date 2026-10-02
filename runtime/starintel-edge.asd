@@ -1,5 +1,5 @@
 (asdf:defsystem "starintel-edge"
-  :description "Canonical StarIntel edge host contract; not an actor engine"
-  :version "0.1.0"
+  :description "Canonical StarIntel edge host contract and offline runtime primitives"
+  :version "0.2.0"
   :serial t
-  :components ((:file "package") (:file "host")))
+  :components ((:file "package") (:file "host") (:file "outbox")))

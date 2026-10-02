@@ -3,7 +3,7 @@
 { pkgs }:
 pkgs.stdenvNoCC.mkDerivation {
   pname = "starintel-edge-host-contract";
-  version = "0.1.0";
+  version = "0.2.0";
   src = ../..;
   nativeBuildInputs = [ pkgs.sbcl pkgs.python3 ];
   dontBuild = true;
@@ -11,10 +11,11 @@ pkgs.stdenvNoCC.mkDerivation {
   checkPhase = ''
     python3 tools/check_contracts.py
     sbcl --script tests/runtime.lisp
+    sbcl --script tests/outbox.lisp
   '';
   installPhase = ''
     mkdir -p "$out/share/starintel-edge"
     cp -r runtime contracts docs "$out/share/starintel-edge/"
   '';
-  meta.description = "StarIntel Edge canonical host contract library (not a device image)";
+  meta.description = "StarIntel Edge canonical host contract and offline runtime primitives (not a device image)";
 }
