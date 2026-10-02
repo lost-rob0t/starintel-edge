@@ -55,12 +55,12 @@ SDK-dependent, not a blanket promise for all glasses.
 
 Implemented in this foundation: a Common Lisp forwarding/admission contract,
 typed Kotlin Android/watch/glasses facades, eight scaffold target-family records,
-contract tests and CI, and Nix packaging for the contract library. Missing runtime
+contract tests and CI, Nix packaging for the contract library, and a bounded restart-durable offline outbox. Missing runtime
 backends explicitly report unavailable; they do not simulate working devices.
 
 **Not implemented by this bootstrap:** actual actor-runtime extraction, ABCL/ART
 integration, Android or watch APKs, vendor SDK bindings, Raspberry Pi boot images,
-durable outbox, P2P runtime, or downstream migrations. Desktop JVM/contract tests
+transport reconciliation/P2P runtime, or downstream migrations. Desktop JVM/contract tests
 are not hardware, Android, watch, or Meta integration tests.
 
 | Remaining work | Tracking |
