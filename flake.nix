@@ -36,6 +36,7 @@
           host-contract-tests = pkgs.runCommand "starintel-edge-host-contract-tests" {
             src = ./.;
             nativeBuildInputs = [
+              pkgs.bash
               pkgs.jdk
               pkgs.kotlin
               pkgs.python3
@@ -45,7 +46,7 @@
             cp -R "$src" source
             chmod -R u+w source
             cd source
-            ./tools/check-host-contracts
+            bash ./tools/check-host-contracts
             mkdir -p "$out"
             printf '%s\n' "StarIntel Edge host-contract checks passed" > "$out/result"
           '';

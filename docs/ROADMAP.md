@@ -13,21 +13,21 @@ The bootstrap implements only a Lisp forwarding/admission contract, JVM-compilab
 ## Reproducible Nix entry points
 
 The root flake pins nixpkgs to immutable commit
-`c93b0882c7def157c311ca297d30f18bc4e23e49`. It exports the host-contract
-package, development shell, formatter, and checks for `x86_64-linux` and
-`aarch64-linux`.
+`c93b0882c7def157c311ca297d30f18bc4e23e49` and commits the resolved
+`flake.lock`. It exports the host-contract package, development shell,
+formatter, and checks for `x86_64-linux` and `aarch64-linux`.
 
 ```sh
-nix develop --no-write-lock-file
-nix build .#edge-host-contract --no-write-lock-file
-nix flake check --no-write-lock-file
-nix flake check --all-systems --no-build --no-write-lock-file
+nix develop
+nix build .#edge-host-contract
+nix flake check
+nix flake check --all-systems --no-build
 ```
 
-The all-systems command is an evaluation gate on the hosted x86_64 runner. It
-does not count as an aarch64 build or Raspberry Pi boot test. A native aarch64
-builder or CI runner remains required before the ARM acceptance gate can be
-marked complete.
+CI runs the same locked flake. The all-systems command is an evaluation gate on
+the hosted x86_64 runner. It does not count as an aarch64 build or Raspberry Pi
+boot test. A native aarch64 builder or CI runner remains required before the ARM
+acceptance gate can be marked complete.
 
 ## Contract tests
 
@@ -39,6 +39,7 @@ The canonical host-contract test command is:
 
 Inside the Nix development shell, that command runs the Python metadata checks,
 the Common Lisp forwarding/admission tests, and the Kotlin/JVM facade contract
-tests.
+tests. The Nix check invokes the same script explicitly through the pinned Bash
+toolchain, so it does not depend on a host `/usr/bin/env`.
 
 No static, fake, host-JVM, or CI-only test substitutes for ARM boot, Android ART, ABCL integration, watch battery/lifecycle or real glasses SDK/hardware tests. Nix expression evaluation/build is also a separate check from these host-contract tests.
