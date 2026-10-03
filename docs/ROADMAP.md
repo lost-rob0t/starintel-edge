@@ -10,14 +10,35 @@ The bootstrap implements only a Lisp forwarding/admission contract, JVM-compilab
 4. **Watch:** share the Android library; build a watch-local lightweight host, power policy, standalone/offline diagnostics and optional relay; test with phone disconnected and actual watch ART.
 5. **Downstream migration/releases:** versioned artifacts and provenance, exact pins, consumers/compatibility tests, mirror policy, staged rollout and rollback. Do not remove prior source until consumers pass.
 
+## Reproducible Nix entry points
+
+The root flake pins nixpkgs to immutable commit
+`c93b0882c7def157c311ca297d30f18bc4e23e49`. It exports the host-contract
+package, development shell, formatter, and checks for `x86_64-linux` and
+`aarch64-linux`.
+
+```sh
+nix develop --no-write-lock-file
+nix build .#edge-host-contract --no-write-lock-file
+nix flake check --no-write-lock-file
+nix flake check --all-systems --no-build --no-write-lock-file
+```
+
+The all-systems command is an evaluation gate on the hosted x86_64 runner. It
+does not count as an aarch64 build or Raspberry Pi boot test. A native aarch64
+builder or CI runner remains required before the ARM acceptance gate can be
+marked complete.
+
 ## Contract tests
 
+The canonical host-contract test command is:
+
+```sh
+./tools/check-host-contracts
 ```
-python3 tools/check_contracts.py
-sbcl --script tests/runtime.lisp
-mkdir -p build
-kotlinc platforms/android/EdgeHost.kt platforms/watch/WatchHost.kt platforms/glasses/GlassesHosts.kt tests/HostContractTest.kt -include-runtime -d build/host-tests.jar
-java -jar build/host-tests.jar
-```
+
+Inside the Nix development shell, that command runs the Python metadata checks,
+the Common Lisp forwarding/admission tests, and the Kotlin/JVM facade contract
+tests.
 
 No static, fake, host-JVM, or CI-only test substitutes for ARM boot, Android ART, ABCL integration, watch battery/lifecycle or real glasses SDK/hardware tests. Nix expression evaluation/build is also a separate check from these host-contract tests.

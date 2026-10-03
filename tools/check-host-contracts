@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+python3 tools/check_contracts.py
+sbcl --script tests/runtime.lisp
+
+build_dir="${STARINTEL_EDGE_BUILD_DIR:-$root/build}"
+mkdir -p "$build_dir"
+
+kotlinc \
+  platforms/android/EdgeHost.kt \
+  platforms/watch/WatchHost.kt \
+  platforms/glasses/GlassesHosts.kt \
+  tests/HostContractTest.kt \
+  -include-runtime \
+  -d "$build_dir/host-tests.jar"
+
+java -jar "$build_dir/host-tests.jar"
