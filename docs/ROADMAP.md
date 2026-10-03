@@ -12,7 +12,17 @@ The bootstrap implements only a Lisp forwarding/admission contract, JVM-compilab
 
 ## Contract tests
 
+The release-facing path is the pinned flake:
+
+```sh
+nix flake check --print-build-logs
+nix build .#edge-host-contract
 ```
+
+For debugging inside the exact dependency set:
+
+```sh
+nix develop
 python3 tools/check_contracts.py
 sbcl --script tests/runtime.lisp
 mkdir -p build
@@ -20,4 +30,8 @@ kotlinc platforms/android/EdgeHost.kt platforms/watch/WatchHost.kt platforms/gla
 java -jar build/host-tests.jar
 ```
 
-No static, fake, host-JVM, or CI-only test substitutes for ARM boot, Android ART, ABCL integration, watch battery/lifecycle or real glasses SDK/hardware tests. Nix expression evaluation/build is also a separate check from these host-contract tests.
+The flake currently validates native host-contract/JVM behavior on Linux for the
+local architecture. It declares both x86_64-linux and aarch64-linux outputs, but
+an x86 CI success is not ARM boot evidence. No static, fake, host-JVM, or CI-only
+test substitutes for ARM boot, Android ART, ABCL integration, watch
+battery/lifecycle, or real glasses SDK/hardware tests.

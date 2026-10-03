@@ -85,3 +85,25 @@ Nix store paths, generated files, or CLI history.
 Downstream releases pin an exact upstream commit and artifact digest, verify
 provenance, and pass the same conformance suite before promotion. Compatibility
 wrappers forward; reusable fixes land here first.
+
+
+## Reproducible Nix entrypoint
+
+The repository root is a pinned Nix flake. The lock file is the dependency authority
+for CI and local edge-contract development; do not replace it with host-installed
+SBCL, Python, Kotlin, or JDK versions when validating a release.
+
+```sh
+nix flake check --print-build-logs
+nix build .#edge-host-contract
+nix develop
+```
+
+The flake exposes native `x86_64-linux` and `aarch64-linux` outputs. The current
+package is still the host-contract library, **not** a Raspberry Pi image or a
+production service. Board images and NixOS service modules stay gated on the
+runtime extraction workstream rather than being simulated here.
+
+CI uses the same `flake.lock` pin and runs both the Common Lisp/Python contract
+checks and the Kotlin/JVM facade test through Nix. Secrets are intentionally not
+accepted as flake inputs or written into the Nix store.
