@@ -30,3 +30,8 @@ distro_component_status(actor_services, runtime_adapter_present_os_service_runne
 
 nix_fact(android_runtime_closure,
          'The Android Lisp asset bundle must include actor-services.lisp plus system-package.lisp and system-api.lisp because starintel-edge/runtime depends on starintel-edge/system-api').
+
+schema_lock_invariant(resolver_compatible,
+                      'The Edge sync workflow emits expansion_path and points manifest_path at schema-lock-manifest.json while portable_manifest_path names the generated binding manifest').
+schema_lock_invariant(no_authority_regression,
+                      'Attax integration preserves the newer exact StarLang commit and complete vendored release closure already pinned on main').
