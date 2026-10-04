@@ -12,6 +12,22 @@ The repository now contains the canonical Sento actor runtime, managed lifecycle
 
 ## Contract tests
 
+The host Lisp suites require Sento and its transitive ASDF systems. On a clean
+Python 3.12+/SBCL host, install the pinned sources into a new directory:
+
+```
+python3 tools/install_host_lisp.py /tmp/edge-host-lisp
+export CL_SOURCE_REGISTRY=/tmp/edge-host-lisp//
+```
+
+`tools/host-lisp-sources.json` pins compressed archive SHA-256 digests for the
+same immutable Quicklisp release URLs used by `flake.nix`. No mutable Quicklisp
+dist or user init file is required. The installer refuses existing destinations,
+verifies each archive before extraction, and applies Python's safe data filter.
+These unmodified sources are for ASDF compilation on SBCL; the native ECL
+source-loading adjustments remain owned by the existing Nix build.
+
+
 ```
 tools/test_android_host.sh
 python3 tools/check_contracts.py
