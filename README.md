@@ -7,6 +7,17 @@ Raspberry Pi/Linux SBCs, Android, smart glasses (including Meta integrations), a
 watches. Downstream distributions and products consume pinned revisions of this
 repository; they must not maintain independent copies of edge runtime behavior.
 
+This repository also ships a custom, headlessly installable StarIntel
+distribution with `edge`, `actors`, and `full` profiles. The Edge profile uses
+ZeroMQ and the embedded Tek9/LMDB database rather than RabbitMQ. See
+[the distribution and actor-package contract](docs/DISTRIBUTION.md).
+
+Attax-OS uses a typed Common Lisp system API for geo providers, Wi-Fi and
+Bluetooth recon, canonical StarIntel document ingest, managed actor services,
+and the canonical Hackmode adapter. Plans target Debian, NixOS, and Termux;
+missing platform providers remain unavailable. Lish is the configured default
+shell, pending an immutable source/package pin for image bundling.
+
 ## Ownership
 
 - Common Lisp owns shared runtime semantics and APIs. Prolog/StarLang supply policy
@@ -33,6 +44,7 @@ See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
 | `contracts/` | Local JSON-LD target catalog and acceptance gates |
 | `tests/` | Common host and platform-facade conformance checks |
 | `downstream/` | Pinning, source migration, release and consumer rules |
+| `distro/` | Headless installer, actor package format, embedded ingest, and NixOS module |
 
 ## Target families
 

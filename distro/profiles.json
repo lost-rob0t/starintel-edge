@@ -1,0 +1,91 @@
+{
+  "format": "STARINTEL-DISTRO-PROFILES/1",
+  "distribution": {
+    "name": "attax-os",
+    "defaultShell": "lish",
+    "supportedPlatforms": ["debian", "nixos", "termux"]
+  },
+  "systemApis": [
+    "geo.position.read",
+    "wifi.observe",
+    "wifi.recon",
+    "bluetooth.observe",
+    "bluetooth.recon",
+    "starintel.document.create",
+    "starintel.document.edit",
+    "starintel.document.ingest",
+    "actor.service.start",
+    "actor.service.stop",
+    "actor.service.status",
+    "hackmode.invoke"
+  ],
+  "reconTools": [
+    "iw",
+    "nmcli",
+    "kismet",
+    "aircrack-ng",
+    "hcxdumptool",
+    "hcxtools",
+    "bettercap",
+    "bluetoothctl",
+    "btmgmt",
+    "gpspipe",
+    "termux-location",
+    "termux-wifi-scaninfo"
+  ],
+  "profiles": {
+    "edge": {
+      "title": "Edge StarIntel",
+      "description": "Sento edge runtime with loopback ZeroMQ ingest and a full-durability Tek9/LMDB local database.",
+      "components": [
+        "starintel-edge-runtime",
+        "starintel-edge-ingest",
+        "starintel-common-lisp-system-api",
+        "hackmode-system-api-adapter",
+        "tek9",
+        "zeromq"
+      ],
+      "transport": "zeromq",
+      "storage": "tek9-lmdb",
+      "requiresActorPackages": false
+    },
+    "actors": {
+      "title": "Actors only",
+      "description": "Digest-locked actor systems installed from GitHub Release assets without a server or database stack.",
+      "components": [
+        "starintel-actor-packages",
+        "starintel-actor-service-adapter",
+        "starintel-common-lisp-system-api",
+        "hackmode-system-api-adapter"
+      ],
+      "transport": "package-defined",
+      "storage": "package-defined",
+      "requiresActorPackages": true
+    },
+    "full": {
+      "title": "Full stack",
+      "description": "Edge ingest, local storage, actor packages, and the server integration surface with optional heavyweight services.",
+      "components": [
+        "starintel-edge-runtime",
+        "starintel-edge-ingest",
+        "starintel-common-lisp-system-api",
+        "hackmode-system-api-adapter",
+        "tek9",
+        "zeromq",
+        "starintel-actor-packages",
+        "starintel-actor-service-adapter",
+        "starintel-server-integration"
+      ],
+      "transport": "zeromq",
+      "storage": "tek9-lmdb",
+      "requiresActorPackages": false
+    }
+  },
+  "heavyOptions": [
+    "rabbitmq",
+    "couchdb",
+    "search",
+    "observability",
+    "gpu-workers"
+  ]
+}
