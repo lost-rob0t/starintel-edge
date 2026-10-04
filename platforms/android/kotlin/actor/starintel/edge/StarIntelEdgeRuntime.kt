@@ -16,6 +16,8 @@ object StarIntelEdgeRuntime {
     external fun abiVersion(): Int
 
     /** Returns null on success or a stable error string on failure.
+     * Managed startup is currently fail-closed: VM signal/thread/shutdown
+     * coexistence remains unverified, independently of native C host tests.
      * One boot per process: after stop or failed boot, use a fresh runtime process.
      * Call start/request/stop on the same owning thread.
      */

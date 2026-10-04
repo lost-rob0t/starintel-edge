@@ -2,12 +2,16 @@
  * Closed C ABI adapter for the embedded Android ECL runtime.
  *
  * One process owns one ECL runtime. The surface is intentionally tiny:
- * starintel_ecl_abi_version, starintel_ecl_start, starintel_ecl_request,
+ * starintel_ecl_abi_version, starintel_ecl_start[_managed], starintel_ecl_request,
  * starintel_ecl_free and starintel_ecl_stop. Requests are bounded JSON
  * envelopes {"op":string,"payload":string,"capability":string}; only the
  * fixed Lisp dispatcher STAR.EDGE.ANDROID:HANDLE-REQUEST is called and
  * request data is never read, evaluated or turned into Lisp forms.
  */
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 
 #include "starintel_ecl_adapter.h"
 #include "starintel_ecl_envelope.h"
@@ -21,6 +25,7 @@
 #include <limits.h>
 
 #include <ecl/ecl.h>
+#include <ecl/impl/math_fenv.h>
 
 #ifdef __ANDROID__
 #include <android/log.h>
@@ -174,7 +179,23 @@ static void stop_lisp_runtime(void)
         (void)si_safe_eval(3, cl_list(1, stop), Cnil, OBJNULL);
 }
 
-int starintel_ecl_start(const char *runtime_directory, char **error)
+/* A JVM shares process signals with ECL, but ECL handlers and atexit shutdown
+ * require an imported ECL thread. Host tests reproduced hangs on foreign JVM
+ * threads even with supported libjsig chaining. Neither host nor ART safe
+ * coexistence is established. Fail before cl_boot, without changing handlers,
+ * registering atexit, importing threads or claiming an available runtime.
+ */
+static const char *managed_embedding_requirement(void)
+{
+#ifdef __ANDROID__
+    return "android-runtime-embedding-unverified";
+#else
+    return "jvm-runtime-embedding-unverified";
+#endif
+}
+
+static int starintel_ecl_start_impl(const char *runtime_directory, char **error,
+                                    int managed)
 {
     struct stat st;
     char *ecl_directory;
@@ -218,6 +239,14 @@ int starintel_ecl_start(const char *runtime_directory, char **error)
         if (error)
             *error = starintel_error("process-restart-required");
         return -1;
+    }
+    if (managed) {
+        const char *requirement = managed_embedding_requirement();
+        if (requirement) {
+            pthread_mutex_unlock(&starintel_ecl_lock);
+            if (error) *error = starintel_error(requirement);
+            return -1;
+        }
     }
     path_len = strlen(runtime_root) + sizeof "/ecl/";
     ecl_directory = malloc(path_len);
@@ -314,7 +343,7 @@ missing_dir:
     return -1;
 }
 
-char *starintel_ecl_request(const char *request_json)
+static char *starintel_ecl_request_impl(const char *request_json)
 {
     struct starintel_envelope env;
     char *result = NULL;
@@ -362,7 +391,7 @@ void starintel_ecl_free(char *value)
     free(value);
 }
 
-void starintel_ecl_stop(void)
+static void starintel_ecl_stop_impl(void)
 {
     pthread_mutex_lock(&starintel_ecl_lock);
     if (starintel_ecl_started) {
@@ -372,4 +401,45 @@ void starintel_ecl_stop(void)
         cl_shutdown();
     }
     pthread_mutex_unlock(&starintel_ecl_lock);
+}
+
+/* ECL changes the owning thread's floating-point traps at boot and while Lisp
+ * executes. Every public transition must restore the caller's complete fenv,
+ * including failed boot, parse/dispatch errors and shutdown. Keep returns in
+ * the implementation functions so no early return can skip the END cleanup.
+ * This preserves Lisp traps inside the boundary; it does not disable them.
+ * The documented same-owning-thread requirement still applies.
+ */
+int starintel_ecl_start(const char *runtime_directory, char **error)
+{
+    int status;
+    ECL_WITH_LISP_FPE_BEGIN {
+        status = starintel_ecl_start_impl(runtime_directory, error, 0);
+    } ECL_WITH_LISP_FPE_END;
+    return status;
+}
+
+int starintel_ecl_start_managed(const char *runtime_directory, char **error)
+{
+    int status;
+    ECL_WITH_LISP_FPE_BEGIN {
+        status = starintel_ecl_start_impl(runtime_directory, error, 1);
+    } ECL_WITH_LISP_FPE_END;
+    return status;
+}
+
+char *starintel_ecl_request(const char *request_json)
+{
+    char *result;
+    ECL_WITH_LISP_FPE_BEGIN {
+        result = starintel_ecl_request_impl(request_json);
+    } ECL_WITH_LISP_FPE_END;
+    return result;
+}
+
+void starintel_ecl_stop(void)
+{
+    ECL_WITH_LISP_FPE_BEGIN {
+        starintel_ecl_stop_impl();
+    } ECL_WITH_LISP_FPE_END;
 }

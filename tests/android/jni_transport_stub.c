@@ -25,6 +25,11 @@ int starintel_ecl_start(const char *directory, char **error)
     *error = copy(strlen(directory) == STARINTEL_ECL_MAX_DIRECTORY_BYTES ? "directory-limit-ok" : directory);
     return -1;
 }
+/* Stub tests only transport encoding; this is not managed embedding evidence. */
+int starintel_ecl_start_managed(const char *directory, char **error)
+{
+    return starintel_ecl_start(directory, error);
+}
 char *starintel_ecl_request(const char *request)
 {
     struct starintel_envelope env;

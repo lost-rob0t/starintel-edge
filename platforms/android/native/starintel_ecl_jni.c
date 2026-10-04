@@ -105,7 +105,7 @@ Java_actor_starintel_edge_StarIntelEdgeRuntime_start(JNIEnv *env,
         if ((*env)->ExceptionCheck(env)) return NULL;
         return literal(env, "invalid-runtime-directory");
     }
-    if (starintel_ecl_start(directory, &error) != 0) {
+    if (starintel_ecl_start_managed(directory, &error) != 0) {
         result = java_string(env, error ? error : "runtime-start-failed", 1024u);
         if (!result && !(*env)->ExceptionCheck(env))
             result = literal(env, "runtime-start-failed");

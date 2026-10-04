@@ -1,5 +1,11 @@
 # Android Common Lisp runtime boundary
 
+> Current safety gate (2026-10-04): managed JVM/ART startup is unavailable before
+> ECL boot. Existing published APKs predate this guard and are **not runtime-ready**.
+> No replacement APK has been built or published for this repair. See
+> [embedding safety evidence](EMBEDDING-SAFETY.md).
+
+
 `starintel-edge` owns the reusable Android runtime artifact. Android products
 consume an exact Edge revision and must not carry a second ECL boot layer,
 Common Lisp actor registry, Tek9 native adapter, or copy of the runtime
@@ -51,17 +57,17 @@ environment access, or shell access.
 
 ## Acceptance gates
 
-| Gate | Status (2026-09-25) |
+| Gate | Current interpretation (2026-10-04) |
 | --- | --- |
-| Native host tests: lifecycle, ownership, bounds, error behavior | Green — `nix build .#checks.x86_64-linux.host-adapter-test` (45/45); ECL boots in-process and exercises the real Sento actor round-trip through the closed dispatcher |
-| Both Android ABI packages build from the pinned Nix flake | Green — `android-runtime-x86_64` and `android-runtime-arm64-v8a` build with matched ECL 26.5.5 cross bootstraps, Android API 24 and NDK 28.2.13676358 |
-| x86_64 emulator loads the libraries inside ART and answers through the Kotlin/JNI boundary | Green — API 36 `emulator-5584`; UI and logcat report ECL boot, adapter ABI 1 and PASS |
-| Actor dispatch exercised locally with networking disabled | Green — Wi-Fi and mobile data disabled; `actor.roundtrip` delivers `android-local` through a real local Sento actor; diagnostic APK declares no Internet permission |
-| ARM64 build/package gate | Green — complete arm64-v8a runtime bundle cross-built from the same flake |
-| Product UI and physical-device claims | Out of scope; separate acceptance evidence required |
+| Standalone native C/ECL | Scoped to controlled host processes and the documented owning thread; arbitrary foreign-thread embedding is not established |
+| Host Java/Kotlin/JNI startup | Fails closed with `jvm-runtime-embedding-unverified` before `cl_boot` |
+| Android ART startup | Fails closed with `android-runtime-embedding-unverified`; separate signal/thread/shutdown acceptance is required |
+| Both Android ABI packages / previous diagnostic APK | Historical packaging evidence only; published APKs predate the guard and are not runtime-ready |
+| Actor dispatch and document payload interoperability | Prior functional passes do not establish managed runtime safety; source-hashed evidence must distinguish old and repaired native adapters |
+| Physical ARM64/watch/glasses behavior | Not established by these host tests |
 
 The closed surface is `starintel_ecl_abi_version`, `starintel_ecl_start`,
-`starintel_ecl_request`, `starintel_ecl_free`, `starintel_ecl_stop`
+`starintel_ecl_start_managed`, `starintel_ecl_request`, `starintel_ecl_free`, `starintel_ecl_stop`
 (`platforms/android/native/starintel_ecl_adapter.h`). Requests are bounded
 JSON envelopes `{"op","payload","capability"}`; unknown fields, duplicates,
 oversized input and malformed JSON are rejected before any Lisp call. Only

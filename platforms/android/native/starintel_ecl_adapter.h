@@ -16,11 +16,22 @@ unsigned int starintel_ecl_abi_version(void);
 /*
  * Starts one process-owned ECL runtime rooted at runtime_directory.
  * Returns zero on success. On failure, *error receives an adapter-owned UTF-8
- * string that the caller releases with starintel_ecl_free. runtime_directory is
+ * string that the caller releases with starintel_ecl_free. Start/request/stop
+ * preserve the owning caller thread's floating-point environment on return.
+ * Signal coexistence is a separate platform acceptance requirement.
+ * runtime_directory is
  * strict standard UTF-8, NUL-terminated, without embedded NUL, at most
  * STARINTEL_ECL_MAX_DIRECTORY_BYTES bytes. Non-Unicode ECL builds are unsupported.
  */
+/* Standalone native process entry; managed/JNI hosts must use the entry below. */
 int starintel_ecl_start(const char *runtime_directory, char **error);
+
+/* Additive ABI 1 managed-host entry. Currently fails closed before native boot:
+ * jvm-runtime-embedding-unverified on host; android-runtime-embedding-unverified
+ * on Android. Signal/foreign-thread/shutdown coexistence needs separate proof.
+ * Caller owns the returned error exactly as with starintel_ecl_start.
+ */
+int starintel_ecl_start_managed(const char *runtime_directory, char **error);
 
 /*
  * Executes one bounded request through the closed Lisp operation dispatcher.

@@ -1,0 +1,420 @@
+{
+  "fixture_sha256": {
+    "research-fixtures.json": "929c5058f7e8a001d9a7000c5f708d2f9f6b4b071be7e5ec5dead40a11f264b9",
+    "supported-workflow-fixtures.json": "beb6cb6dc8dada43328e01172c4c475c882a64f4c47aeae6d1edff85eb575782",
+    "canonical-migration-fixtures.json": "7f70fecc59ae472cd0429269076162fe8f9c740e9c1d6fae867f6cc823d77250"
+  },
+  "harness_sha256": {
+    "document_js.cjs": "c9b8eeb80644a53d67c9b6098b23f751cd736dd3f54b046868065338a229a957",
+    "document_lisp.lisp": "67135550580b688f9bf17cc421b2bbd06d14d738e139f3249995a84097dd5a3c",
+    "document_nim.nim": "ff26641acd49ca2f4aea595a6c480912fe8a68c5aa974729642bda81278a2cbe",
+    "document_typescript.ts": "8d9753bb045c3231b7b92f4a52578290a4fdbaf24bf0227fb8ce350cadb74937",
+    "document_python.py": "6c33a94a1aa777e55b16c8c6c95bf453b01478b3f84a76f91d45f149cb31898c",
+    "test_documents.py": "c433de64dbdc010cf5db92ae0ca8783951435123db41f705e0a81d100d4e25af",
+    "test_harness.py": "d31664a0e532cdfadc425125cbd5db0d7355da6f54a08ebb24ae45b95028e7e5"
+  },
+  "tools": {
+    "python": "Python 3.12.14",
+    "node": "v24.19.0",
+    "sbcl": "SBCL 2.2.9.debian",
+    "nim": "Nim Compiler Version 2.2.4 [Linux: amd64]\nCompiled at 2025-04-22\nCopyright (c) 2006-2025 by Andreas Rumpf\n\ngit hash: f7145dd26efeeeb6eeae6fff649db244d81b212d\nactive boot switches: -d:release"
+  },
+  "authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "sdk_provenance": {
+    "python": {
+      "tracked_worktree_clean": true,
+      "commit": "aa420327ffa62b5305881c9719fef64f5adbbee9",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.py": "83b6d93cbd16e2f71137e068042e7fb63322d5e2d642dcbca8ed99c0b871bc4f"
+      },
+      "valid_wire_sha256": "98d8b767666cf7031b6794f49014566ca083ebb6f4af6908f413429efd663045"
+    },
+    "cl": {
+      "tracked_worktree_clean": true,
+      "commit": "c3d18acfee4dc6f65a0e45e88c992a6f700091c7",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel.lisp": "64476a8df88cfb4bf7b158979b0200537017245878d9e7390ac86a30eac24f71"
+      },
+      "valid_wire_sha256": "be82fd7f908200bc044dd6f478c194176d99c4e5c4dd3557eba49dcdf7e14645"
+    },
+    "nim": {
+      "tracked_worktree_clean": true,
+      "commit": "bdd5ac1fd6dfd9d9e541f6a6841a7fa8720754ed",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.nim": "4c009446c43c5ae050f3abcb564e089331e35b0ccc78f1de99ababa0844d3890"
+      },
+      "valid_wire_sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7"
+    },
+    "js": {
+      "tracked_worktree_clean": true,
+      "commit": "456b692e8255df0bd4cb996c2542b68276ff52f0",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.ts": "e41862118667430c5cc8a4a3ca648c8fa2a6495352bb9f8e5acfbd93734756ff"
+      },
+      "valid_wire_sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7"
+    },
+    "typescript": {
+      "valid_wire_sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7"
+    }
+  },
+  "scope": "actual SDK subprocess NDJSON; Nim validation SDK plus native JSON codec, not full generated typed Nim codecs; TS uses JS SDK; no actor, network mesh or Android ART claim",
+  "document_types": 90,
+  "valid_cases": [
+    "dtype:document",
+    "dtype:person",
+    "dtype:person-identifier",
+    "dtype:org",
+    "dtype:relation",
+    "dtype:domain",
+    "dtype:service",
+    "dtype:port",
+    "dtype:network",
+    "dtype:asn",
+    "dtype:host",
+    "dtype:url",
+    "dtype:breach",
+    "dtype:email",
+    "dtype:email-message",
+    "dtype:user",
+    "dtype:phone",
+    "dtype:geo",
+    "dtype:geo-point",
+    "dtype:geo-line-string",
+    "dtype:geo-polygon",
+    "dtype:geo-multi-point",
+    "dtype:geo-multi-line-string",
+    "dtype:geo-multi-polygon",
+    "dtype:geo-geometry-collection",
+    "dtype:location",
+    "dtype:address",
+    "dtype:mission",
+    "dtype:mission-target",
+    "dtype:route",
+    "dtype:geofence",
+    "dtype:encounter",
+    "dtype:map-layer",
+    "dtype:message",
+    "dtype:socialmpost",
+    "dtype:operation",
+    "dtype:investigation-target",
+    "dtype:alert",
+    "dtype:analysis",
+    "dtype:asset",
+    "dtype:campaign-finance",
+    "dtype:claim",
+    "dtype:concept",
+    "dtype:contract",
+    "dtype:dataset-manifest",
+    "dtype:education",
+    "dtype:employment",
+    "dtype:entity",
+    "dtype:event",
+    "dtype:evidence-record",
+    "dtype:financial-observation",
+    "dtype:grant",
+    "dtype:legal-case",
+    "dtype:lobbying-filing",
+    "dtype:meeting",
+    "dtype:observation",
+    "dtype:ownership",
+    "dtype:policy",
+    "dtype:procurement",
+    "dtype:product",
+    "dtype:research-node",
+    "dtype:research-pass",
+    "dtype:social-media-post",
+    "dtype:source",
+    "dtype:task",
+    "dtype:target",
+    "dtype:actor-manifest",
+    "dtype:artifact",
+    "dtype:finding",
+    "dtype:scope",
+    "dtype:file",
+    "dtype:media",
+    "dtype:image",
+    "dtype:picture",
+    "dtype:video",
+    "dtype:video-frame",
+    "dtype:audio",
+    "dtype:audio-segment",
+    "dtype:speech-segment",
+    "dtype:speaker",
+    "dtype:speaker-observation",
+    "dtype:speaker-turn",
+    "dtype:transcript",
+    "dtype:http-transaction",
+    "dtype:web-capture",
+    "dtype:pcap-capture",
+    "dtype:network-conversation",
+    "dtype:network-device",
+    "dtype:wireless-network",
+    "dtype:wireless-station",
+    "unicode-nul-absence-null-false-exact-numbers",
+    "research-fixtures.json:minimal-operation",
+    "research-fixtures.json:research-target-not-scheduler",
+    "supported-workflow-fixtures.json:alert-all-fields",
+    "supported-workflow-fixtures.json:analysis-all-fields",
+    "supported-workflow-fixtures.json:asset-all-fields",
+    "supported-workflow-fixtures.json:campaign-finance-all-fields",
+    "supported-workflow-fixtures.json:claim-all-fields",
+    "supported-workflow-fixtures.json:concept-all-fields",
+    "supported-workflow-fixtures.json:contract-all-fields",
+    "supported-workflow-fixtures.json:dataset-manifest-all-fields",
+    "supported-workflow-fixtures.json:education-all-fields",
+    "supported-workflow-fixtures.json:employment-all-fields",
+    "supported-workflow-fixtures.json:entity-all-fields",
+    "supported-workflow-fixtures.json:event-all-fields",
+    "supported-workflow-fixtures.json:evidence-record-all-fields",
+    "supported-workflow-fixtures.json:financial-observation-all-fields",
+    "supported-workflow-fixtures.json:grant-all-fields",
+    "supported-workflow-fixtures.json:legal-case-all-fields",
+    "supported-workflow-fixtures.json:lobbying-filing-all-fields",
+    "supported-workflow-fixtures.json:meeting-all-fields",
+    "supported-workflow-fixtures.json:observation-all-fields",
+    "supported-workflow-fixtures.json:ownership-all-fields",
+    "supported-workflow-fixtures.json:policy-all-fields",
+    "supported-workflow-fixtures.json:procurement-all-fields",
+    "supported-workflow-fixtures.json:product-all-fields",
+    "supported-workflow-fixtures.json:research-node-all-fields",
+    "supported-workflow-fixtures.json:research-pass-all-fields",
+    "supported-workflow-fixtures.json:social-media-post-all-fields",
+    "supported-workflow-fixtures.json:source-all-fields",
+    "supported-workflow-fixtures.json:task-all-fields",
+    "canonical-migration-fixtures.json:migration-v090-alert",
+    "canonical-migration-fixtures.json:migration-v090-analysis",
+    "canonical-migration-fixtures.json:migration-v090-asset",
+    "canonical-migration-fixtures.json:migration-v090-campaign-finance",
+    "canonical-migration-fixtures.json:migration-v090-claim",
+    "canonical-migration-fixtures.json:migration-v090-concept",
+    "canonical-migration-fixtures.json:migration-v090-contract",
+    "canonical-migration-fixtures.json:migration-v090-dataset-manifest",
+    "canonical-migration-fixtures.json:migration-v090-education",
+    "canonical-migration-fixtures.json:migration-v090-employment",
+    "canonical-migration-fixtures.json:migration-v090-entity",
+    "canonical-migration-fixtures.json:migration-v090-event",
+    "canonical-migration-fixtures.json:migration-v090-evidence-record",
+    "canonical-migration-fixtures.json:migration-v090-financial-observation",
+    "canonical-migration-fixtures.json:migration-v090-grant",
+    "canonical-migration-fixtures.json:migration-v090-legal-case",
+    "canonical-migration-fixtures.json:migration-v090-lobbying-filing",
+    "canonical-migration-fixtures.json:migration-v090-meeting",
+    "canonical-migration-fixtures.json:migration-v090-observation",
+    "canonical-migration-fixtures.json:migration-v090-ownership",
+    "canonical-migration-fixtures.json:migration-v090-policy",
+    "canonical-migration-fixtures.json:migration-v090-procurement",
+    "canonical-migration-fixtures.json:migration-v090-product",
+    "canonical-migration-fixtures.json:migration-v090-research-node",
+    "canonical-migration-fixtures.json:migration-v090-research-pass",
+    "canonical-migration-fixtures.json:migration-v090-social-media-post",
+    "canonical-migration-fixtures.json:migration-v090-source",
+    "canonical-migration-fixtures.json:migration-v090-task"
+  ],
+  "invalid_cases": [
+    "wireless-network:security:wpa4",
+    "person:sources:[{'id': 'source'}]",
+    "person:schemaVersion:0.10.2",
+    "person:schemaVersion:0.9.0",
+    "person:createdAt:-1",
+    "person:confidence:0.12345",
+    "person:deleted:None",
+    "person:dtype:unknown",
+    "person:id:invalid space",
+    "research-fixtures.json:empty-phases",
+    "research-fixtures.json:self-cycle",
+    "research-fixtures.json:unknown-dataset",
+    "research-fixtures.json:missing-evidence",
+    "research-fixtures.json:scope-contradiction"
+  ],
+  "matrix": [
+    {
+      "producer": "python",
+      "consumer": "python",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "js",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "cl",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "nim",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "typescript",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "python",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "js",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "cl",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "nim",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "typescript",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "python",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "js",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "cl",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "nim",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "typescript",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "python",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "js",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "cl",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "nim",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "typescript",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "python",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "js",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "cl",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "nim",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "typescript",
+      "valid": 149,
+      "invalid": 14,
+      "status": "passed"
+    }
+  ],
+  "failures": [],
+  "not_independent_document_runtimes": {
+    "typescript": "separate compiled TypeScript adapter; shares actual JS SDK runtime",
+    "java/kotlin/c": "Edge platform/actor boundaries only",
+    "go/rust/elisp/prolog": "no executable 0.10.1 document adapters found"
+  }
+}

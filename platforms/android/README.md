@@ -1,5 +1,11 @@
 # Android foreground-service host
 
+> Managed runtime safety gate (2026-10-04): JNI startup now returns
+> `android-runtime-embedding-unverified` before ECL boot. Earlier published APKs
+> predate this source guard and are **not runtime-ready**. No new APK was built or
+> published for this repair. See [embedding safety](../../docs/EMBEDDING-SAFETY.md).
+
+
 This source reuses the existing ECL/LMDB/JNI runtime at
 `f801b024965488c21f93c52a1a9fd2aecd224700`. It adds an Android library and diagnostic
 service app, not another Lisp implementation or a remote proxy. **Debug APK/AAR

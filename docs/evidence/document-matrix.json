@@ -1,0 +1,596 @@
+{
+  "fixture_sha256": {
+    "research-fixtures.json": "929c5058f7e8a001d9a7000c5f708d2f9f6b4b071be7e5ec5dead40a11f264b9",
+    "supported-workflow-fixtures.json": "beb6cb6dc8dada43328e01172c4c475c882a64f4c47aeae6d1edff85eb575782",
+    "canonical-migration-fixtures.json": "7f70fecc59ae472cd0429269076162fe8f9c740e9c1d6fae867f6cc823d77250",
+    "numeric-canonical-migration-fixtures.json": "be5bc82856483e870513fb9546b8ca0500dd35128f6d94f4a19695d4dfaa455d"
+  },
+  "harness_sha256": {
+    "document_js.cjs": "c9b8eeb80644a53d67c9b6098b23f751cd736dd3f54b046868065338a229a957",
+    "document_lisp.lisp": "4b4c1ae8fcd8d0317f44969a934593bc335eb41579b3dcb0479fb9127316f119",
+    "document_nim.nim": "053d1c48f44c87943d4e48fd7876adf3e1368f7dcb438cc9faccf89d09f2b02f",
+    "document_typescript.ts": "8d9753bb045c3231b7b92f4a52578290a4fdbaf24bf0227fb8ce350cadb74937",
+    "document_python.py": "6e52e07b4a39795285f4b769aaffddfd83b33aa5996da1e7228eb2e7131dfe7a",
+    "test_documents.py": "4a6767f0f54b586b0321379a3ad3f9e033313a6c63465d11c80b622c29ceaaa1",
+    "test_harness.py": "be50534d626d40595ff008117bd0cb78c60f458ae60a282e57722565a025f316"
+  },
+  "tools": {
+    "python": "Python 3.12.14",
+    "node": "v24.19.0",
+    "sbcl": "SBCL 2.2.9.debian",
+    "nim": "Nim Compiler Version 2.2.4 [Linux: amd64]\nCompiled at 2025-04-22\nCopyright (c) 2006-2025 by Andreas Rumpf\n\ngit hash: f7145dd26efeeeb6eeae6fff649db244d81b212d\nactive boot switches: -d:release"
+  },
+  "authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "sdk_provenance": {
+    "python": {
+      "tracked_worktree_clean": true,
+      "commit": "5096ab039cb240aae0057fbed8ae6a7667321bbf",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.py": "83b6d93cbd16e2f71137e068042e7fb63322d5e2d642dcbca8ed99c0b871bc4f"
+      },
+      "valid_wire_sha256": "855247e365bf780e9281b257aff312083639dc4d7039079c3471a817150160a9",
+      "numeric_wire_sha256": "97bb72789d713b465b75e9d117065b0e7d87aff93ac9af9ae7dcc500d12ed258"
+    },
+    "cl": {
+      "tracked_worktree_clean": true,
+      "commit": "9f365eab1088242355686b640054a935c2b8a7f4",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel.lisp": "64476a8df88cfb4bf7b158979b0200537017245878d9e7390ac86a30eac24f71"
+      },
+      "valid_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "numeric_wire_sha256": "11ffcc405464c94450075b0dc61398ee1c4d87e1c4ab53bed489aba1a1452a4a"
+    },
+    "nim": {
+      "tracked_worktree_clean": true,
+      "commit": "26f9fb4fbd54c4d72fc57c7450954a4fed3b6fec",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.nim": "4c009446c43c5ae050f3abcb564e089331e35b0ccc78f1de99ababa0844d3890"
+      },
+      "valid_wire_sha256": "69327075a4f8325bcdc2cd44711429267b97468111d049aae7cd2fdeeb1522ca",
+      "numeric_wire_sha256": "11ffcc405464c94450075b0dc61398ee1c4d87e1c4ab53bed489aba1a1452a4a"
+    },
+    "js": {
+      "tracked_worktree_clean": true,
+      "commit": "8b15b2e0eb4d5562979a8d9b0565fe6eb70b82c4",
+      "generated": {
+        "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
+        "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
+        "starintel_types.ts": "e41862118667430c5cc8a4a3ca648c8fa2a6495352bb9f8e5acfbd93734756ff"
+      },
+      "valid_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "numeric_wire_sha256": "230676ad8fe68502e258d03768753238470915c1872fa016c747f6c638129921"
+    },
+    "typescript": {
+      "valid_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "numeric_wire_sha256": "230676ad8fe68502e258d03768753238470915c1872fa016c747f6c638129921"
+    }
+  },
+  "scope": "actual SDK subprocess NDJSON; Nim validation SDK plus native JSON codec, not full generated typed Nim codecs; TS uses JS SDK; no actor, network mesh or Android ART claim",
+  "raw_numeric_valid_cases": [
+    [
+      "createdAt",
+      "9223372036854775808"
+    ],
+    [
+      "createdAt",
+      "1.0"
+    ],
+    [
+      "createdAt",
+      "1e0"
+    ],
+    [
+      "createdAt",
+      "1e400"
+    ],
+    [
+      "createdAt",
+      "0e-400"
+    ],
+    [
+      "createdAt",
+      "1e999999999999999999999"
+    ],
+    [
+      "extensions",
+      "{\"fraction\":0.12345678901234567890123456789}"
+    ],
+    [
+      "extensions",
+      "{\"integer\":9223372036854775809}"
+    ],
+    [
+      "extensions",
+      "{\"large\":1e400,\"small\":1e-400}"
+    ],
+    [
+      "extensions",
+      "{\"ultraSmall\":1e-999999999999999999999}"
+    ]
+  ],
+  "raw_numeric_invalid_cases": [
+    [
+      "createdAt",
+      "1.00000000000000000000000000001"
+    ],
+    [
+      "createdAt",
+      "1e-400"
+    ],
+    [
+      "createdAt",
+      "-1e400"
+    ],
+    [
+      "createdAt",
+      "\"9223372036854775808\""
+    ],
+    [
+      "createdAt",
+      "1e-999999999999999999999"
+    ]
+  ],
+  "document_types": 90,
+  "valid_cases": [
+    "dtype:document",
+    "dtype:person",
+    "dtype:person-identifier",
+    "dtype:org",
+    "dtype:relation",
+    "dtype:domain",
+    "dtype:service",
+    "dtype:port",
+    "dtype:network",
+    "dtype:asn",
+    "dtype:host",
+    "dtype:url",
+    "dtype:breach",
+    "dtype:email",
+    "dtype:email-message",
+    "dtype:user",
+    "dtype:phone",
+    "dtype:geo",
+    "dtype:geo-point",
+    "dtype:geo-line-string",
+    "dtype:geo-polygon",
+    "dtype:geo-multi-point",
+    "dtype:geo-multi-line-string",
+    "dtype:geo-multi-polygon",
+    "dtype:geo-geometry-collection",
+    "dtype:location",
+    "dtype:address",
+    "dtype:mission",
+    "dtype:mission-target",
+    "dtype:route",
+    "dtype:geofence",
+    "dtype:encounter",
+    "dtype:map-layer",
+    "dtype:message",
+    "dtype:socialmpost",
+    "dtype:operation",
+    "dtype:investigation-target",
+    "dtype:alert",
+    "dtype:analysis",
+    "dtype:asset",
+    "dtype:campaign-finance",
+    "dtype:claim",
+    "dtype:concept",
+    "dtype:contract",
+    "dtype:dataset-manifest",
+    "dtype:education",
+    "dtype:employment",
+    "dtype:entity",
+    "dtype:event",
+    "dtype:evidence-record",
+    "dtype:financial-observation",
+    "dtype:grant",
+    "dtype:legal-case",
+    "dtype:lobbying-filing",
+    "dtype:meeting",
+    "dtype:observation",
+    "dtype:ownership",
+    "dtype:policy",
+    "dtype:procurement",
+    "dtype:product",
+    "dtype:research-node",
+    "dtype:research-pass",
+    "dtype:social-media-post",
+    "dtype:source",
+    "dtype:task",
+    "dtype:target",
+    "dtype:actor-manifest",
+    "dtype:artifact",
+    "dtype:finding",
+    "dtype:scope",
+    "dtype:file",
+    "dtype:media",
+    "dtype:image",
+    "dtype:picture",
+    "dtype:video",
+    "dtype:video-frame",
+    "dtype:audio",
+    "dtype:audio-segment",
+    "dtype:speech-segment",
+    "dtype:speaker",
+    "dtype:speaker-observation",
+    "dtype:speaker-turn",
+    "dtype:transcript",
+    "dtype:http-transaction",
+    "dtype:web-capture",
+    "dtype:pcap-capture",
+    "dtype:network-conversation",
+    "dtype:network-device",
+    "dtype:wireless-network",
+    "dtype:wireless-station",
+    "unicode-nul-absence-null-false-exact-numbers",
+    "research-fixtures.json:minimal-operation",
+    "research-fixtures.json:research-target-not-scheduler",
+    "supported-workflow-fixtures.json:alert-all-fields",
+    "supported-workflow-fixtures.json:analysis-all-fields",
+    "supported-workflow-fixtures.json:asset-all-fields",
+    "supported-workflow-fixtures.json:campaign-finance-all-fields",
+    "supported-workflow-fixtures.json:claim-all-fields",
+    "supported-workflow-fixtures.json:concept-all-fields",
+    "supported-workflow-fixtures.json:contract-all-fields",
+    "supported-workflow-fixtures.json:dataset-manifest-all-fields",
+    "supported-workflow-fixtures.json:education-all-fields",
+    "supported-workflow-fixtures.json:employment-all-fields",
+    "supported-workflow-fixtures.json:entity-all-fields",
+    "supported-workflow-fixtures.json:event-all-fields",
+    "supported-workflow-fixtures.json:evidence-record-all-fields",
+    "supported-workflow-fixtures.json:financial-observation-all-fields",
+    "supported-workflow-fixtures.json:grant-all-fields",
+    "supported-workflow-fixtures.json:legal-case-all-fields",
+    "supported-workflow-fixtures.json:lobbying-filing-all-fields",
+    "supported-workflow-fixtures.json:meeting-all-fields",
+    "supported-workflow-fixtures.json:observation-all-fields",
+    "supported-workflow-fixtures.json:ownership-all-fields",
+    "supported-workflow-fixtures.json:policy-all-fields",
+    "supported-workflow-fixtures.json:procurement-all-fields",
+    "supported-workflow-fixtures.json:product-all-fields",
+    "supported-workflow-fixtures.json:research-node-all-fields",
+    "supported-workflow-fixtures.json:research-pass-all-fields",
+    "supported-workflow-fixtures.json:social-media-post-all-fields",
+    "supported-workflow-fixtures.json:source-all-fields",
+    "supported-workflow-fixtures.json:task-all-fields",
+    "canonical-migration-fixtures.json:migration-v090-alert",
+    "canonical-migration-fixtures.json:migration-v090-analysis",
+    "canonical-migration-fixtures.json:migration-v090-asset",
+    "canonical-migration-fixtures.json:migration-v090-campaign-finance",
+    "canonical-migration-fixtures.json:migration-v090-claim",
+    "canonical-migration-fixtures.json:migration-v090-concept",
+    "canonical-migration-fixtures.json:migration-v090-contract",
+    "canonical-migration-fixtures.json:migration-v090-dataset-manifest",
+    "canonical-migration-fixtures.json:migration-v090-education",
+    "canonical-migration-fixtures.json:migration-v090-employment",
+    "canonical-migration-fixtures.json:migration-v090-entity",
+    "canonical-migration-fixtures.json:migration-v090-event",
+    "canonical-migration-fixtures.json:migration-v090-evidence-record",
+    "canonical-migration-fixtures.json:migration-v090-financial-observation",
+    "canonical-migration-fixtures.json:migration-v090-grant",
+    "canonical-migration-fixtures.json:migration-v090-legal-case",
+    "canonical-migration-fixtures.json:migration-v090-lobbying-filing",
+    "canonical-migration-fixtures.json:migration-v090-meeting",
+    "canonical-migration-fixtures.json:migration-v090-observation",
+    "canonical-migration-fixtures.json:migration-v090-ownership",
+    "canonical-migration-fixtures.json:migration-v090-policy",
+    "canonical-migration-fixtures.json:migration-v090-procurement",
+    "canonical-migration-fixtures.json:migration-v090-product",
+    "canonical-migration-fixtures.json:migration-v090-research-node",
+    "canonical-migration-fixtures.json:migration-v090-research-pass",
+    "canonical-migration-fixtures.json:migration-v090-social-media-post",
+    "canonical-migration-fixtures.json:migration-v090-source",
+    "canonical-migration-fixtures.json:migration-v090-task",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-exponent",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-fraction",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-negative-zero",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-fraction-zero",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-huge-exponent",
+    "numeric-canonical-migration-fixtures.json:migration-numeric-tiny-exponent"
+  ],
+  "invalid_cases": [
+    "wireless-network:security:wpa4",
+    "person:sources:[{'id': 'source'}]",
+    "person:schemaVersion:0.10.2",
+    "person:schemaVersion:0.9.0",
+    "person:createdAt:-1",
+    "person:confidence:0.12345",
+    "person:deleted:None",
+    "person:dtype:unknown",
+    "person:id:invalid space",
+    "research-fixtures.json:empty-phases",
+    "research-fixtures.json:self-cycle",
+    "research-fixtures.json:unknown-dataset",
+    "research-fixtures.json:missing-evidence",
+    "research-fixtures.json:scope-contradiction"
+  ],
+  "matrix": [
+    {
+      "producer": "python",
+      "consumer": "python",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "python-to-python-valid.ndjson",
+      "consumer_wire_sha256": "855247e365bf780e9281b257aff312083639dc4d7039079c3471a817150160a9",
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "js",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "python-to-js-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "cl",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "python-to-cl-valid.ndjson",
+      "consumer_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "nim",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "python-to-nim-valid.ndjson",
+      "consumer_wire_sha256": "855247e365bf780e9281b257aff312083639dc4d7039079c3471a817150160a9",
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "typescript",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "python-to-typescript-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "python",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "js-to-python-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "js",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "js-to-js-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "cl",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "js-to-cl-valid.ndjson",
+      "consumer_wire_sha256": "1ce2a9e038378a7c90c0f4c6ddd60d91cf82f22eb1f6e8dfa79f6c15e3bdff99",
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "nim",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "js-to-nim-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "typescript",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "js-to-typescript-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "python",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "cl-to-python-valid.ndjson",
+      "consumer_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "js",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "cl-to-js-valid.ndjson",
+      "consumer_wire_sha256": "1ce2a9e038378a7c90c0f4c6ddd60d91cf82f22eb1f6e8dfa79f6c15e3bdff99",
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "cl",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "cl-to-cl-valid.ndjson",
+      "consumer_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "nim",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "cl-to-nim-valid.ndjson",
+      "consumer_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "typescript",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "cl-to-typescript-valid.ndjson",
+      "consumer_wire_sha256": "1ce2a9e038378a7c90c0f4c6ddd60d91cf82f22eb1f6e8dfa79f6c15e3bdff99",
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "python",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "nim-to-python-valid.ndjson",
+      "consumer_wire_sha256": "855247e365bf780e9281b257aff312083639dc4d7039079c3471a817150160a9",
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "js",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "nim-to-js-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "cl",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "nim-to-cl-valid.ndjson",
+      "consumer_wire_sha256": "fb46ab71a21de1b610f3c5ea1daeef1f9fbbfb64c6c88c1503f26e6053d846e0",
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "nim",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "nim-to-nim-valid.ndjson",
+      "consumer_wire_sha256": "69327075a4f8325bcdc2cd44711429267b97468111d049aae7cd2fdeeb1522ca",
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "typescript",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "nim-to-typescript-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "python",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "typescript-to-python-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "js",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "typescript-to-js-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "cl",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "typescript-to-cl-valid.ndjson",
+      "consumer_wire_sha256": "1ce2a9e038378a7c90c0f4c6ddd60d91cf82f22eb1f6e8dfa79f6c15e3bdff99",
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "nim",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "typescript-to-nim-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "typescript",
+      "valid": 155,
+      "invalid": 14,
+      "numeric_valid": 10,
+      "numeric_invalid": 5,
+      "consumer_wire_file": "typescript-to-typescript-valid.ndjson",
+      "consumer_wire_sha256": "fd0f9b92bbe4127d5752e5b616d02e6fb108112fd77489011f21a217c0ea8e57",
+      "status": "passed"
+    }
+  ],
+  "failures": [],
+  "not_independent_document_runtimes": {
+    "typescript": "separate compiled TypeScript adapter; shares actual JS SDK runtime",
+    "java/kotlin/c": "Edge platform/actor boundaries only",
+    "go/rust/elisp/prolog": "no executable 0.10.1 document adapters found"
+  }
+}
