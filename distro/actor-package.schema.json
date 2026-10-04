@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://starintel.actor/schema/actor-package-v1.json",
+  "title": "StarIntel actor package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "name", "version", "actorSystem", "entrypoint", "starintel"],
+  "properties": {
+    "format": {"const": "STARINTEL-ACTOR-PACKAGE/1"},
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"},
+    "actorSystem": {"enum": ["sento", "pykka", "starlang"]},
+    "entrypoint": {"type": "string", "minLength": 1, "maxLength": 512},
+    "starintel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["releaseVersion", "schemaVersion"],
+      "properties": {
+        "releaseVersion": {"type": "string"},
+        "schemaVersion": {"type": "string"}
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    }
+  }
+}

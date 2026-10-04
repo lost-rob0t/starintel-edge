@@ -1,11 +1,17 @@
 {
   description = "Reproducible StarIntel Edge runtimes and Android ECL artifacts";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    tek9 = {
+      url = "git+https://git.starintel.actor/starintel-labs/tek9.git?rev=1cb978084da8b4f1d184b3ef2a1d30057f525608";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, tek9 }:
     let
-      systems = [ "x86_64-linux" ];
+      systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
       mkPackages = system:
         let
@@ -16,6 +22,9 @@
               android_sdk.accept_license = true;
             };
           };
+          spec = builtins.fromJSON
+            (builtins.readFile ./schema/starintel-schema.lock.json);
+          cl = pkgs.sbcl.pkgs;
           apiLevel = "24";
           ndkVersion = "28.2.13676358";
           android = pkgs.androidenv.composeAndroidPackages {
@@ -160,22 +169,24 @@
             hash = "sha256-OGaqhBkHKNUwHY3FgnMbWGdsUfBn0QDTl2vTZPu28DM=";
           };
           clSpeedyQueueSourceLoad = pkgs.runCommand
-            "cl-speedy-queue-source-load" { } ''
-              cp -R ${clSpeedyQueueSrc}/. "$out"
-              chmod -R u+w "$out"
-              substituteInPlace "$out/cl-speedy-queue.lisp" \
-                --replace-fail \
-                '(eval-when (:compile-toplevel)' \
-                '(eval-when (:compile-toplevel :load-toplevel :execute)'
-            '';
+            "cl-speedy-queue-source-load"
+            { } ''
+            cp -R ${clSpeedyQueueSrc}/. "$out"
+            chmod -R u+w "$out"
+            substituteInPlace "$out/cl-speedy-queue.lisp" \
+              --replace-fail \
+              '(eval-when (:compile-toplevel)' \
+              '(eval-when (:compile-toplevel :load-toplevel :execute)'
+          '';
 
           # The Quicklisp cl-unicode archive omits three generated source
           # files and tries to regenerate them beside its read-only source.
           # Generate them once in a reproducible writable derivation so ART
           # never needs a build-time Unicode data generator.
-          clUnicodeGenerated = pkgs.runCommand "cl-unicode-generated-source" {
-            nativeBuildInputs = [ pkgs.ecl ];
-          } ''
+          clUnicodeGenerated = pkgs.runCommand "cl-unicode-generated-source"
+            {
+              nativeBuildInputs = [ pkgs.ecl ];
+            } ''
             cp -R ${clUnicodeSrc}/. "$out"
             chmod -R u+w "$out"
             export CL_SOURCE_REGISTRY="${clPpcreSrc}//:${flexiStreamsSrc}//:${trivialGrayStreamsSrc}//:$out//"
@@ -251,7 +262,8 @@
             (source: ''
               cp -R ${source.src} \
                 "$out/${source.name}"
-            '') actorVendorSources;
+            '')
+            actorVendorSources;
           actorVendorTree = pkgs.runCommand "starintel-edge-actor-vendor" { } ''
             mkdir -p "$out"
             ${populateActorVendor}
@@ -458,33 +470,161 @@
               install -Dm755 native_test $out/bin/native_test
             '';
           };
-        in {
+
+          edgeRuntime = pkgs.sbcl.buildASDFSystem {
+            pname = "starintel-edge-runtime";
+            version = "0.1.0";
+            src = self;
+            systems = [
+              "starintel-edge"
+              "starintel-edge/system-api"
+              "starintel-edge/runtime"
+            ];
+            lispLibs = [ cl.sento cl."bordeaux-threads" ];
+          };
+
+          embeddedIngest = pkgs.sbcl.buildASDFSystem {
+            pname = "starintel-edge-ingest";
+            version = "0.1.0";
+            src = self;
+            systems = [ "starintel-edge-ingest" ];
+            nativeLibs = [ pkgs.zeromq pkgs.lmdb.out ];
+            lispLibs = [
+              edgeRuntime
+              tek9.packages.${system}.tek9
+              cl.babel
+              cl.jsown
+              cl.pzmq
+            ];
+          };
+
+          embeddedIngestLisp = pkgs.sbcl.withPackages (_: [ embeddedIngest ]);
+          edgeIngest = pkgs.writeShellApplication {
+            name = "starintel-edge-ingest";
+            text = ''
+              exec ${embeddedIngestLisp}/bin/sbcl \
+                --noinform \
+                --disable-debugger \
+                --non-interactive \
+                --eval '(require :asdf)' \
+                --eval '(asdf:load-system :starintel-edge-ingest)' \
+                --eval '(star.edge.ingest:main)'
+            '';
+          };
+
+          installer = pkgs.stdenvNoCC.mkDerivation {
+            pname = "starintel-installer";
+            version = "0.1.0";
+            src = self;
+            nativeBuildInputs = [ pkgs.python3 ];
+            dontBuild = true;
+            installPhase = ''
+              mkdir -p "$out/share/starintel-distro/schema" "$out/bin"
+              cp distro/profiles.json \
+                distro/actor-package.schema.json \
+                distro/actor-lock.schema.json \
+                "$out/share/starintel-distro/"
+              cp schema/starintel-schema.lock.json \
+                "$out/share/starintel-distro/schema/"
+              install -Dm755 distro/starintel_install.py \
+                "$out/share/starintel-distro/starintel_install.py"
+              patchShebangs "$out/share/starintel-distro/starintel_install.py"
+              ln -s ../share/starintel-distro/starintel_install.py \
+                "$out/bin/starintel-install"
+            '';
+          };
+
+          installerTest = pkgs.runCommand "starintel-installer-test"
+            {
+              nativeBuildInputs = [ pkgs.python3 ];
+            } ''
+            export STARINTEL_DISTRO_SHARE=${self}/distro
+            cd ${self}
+            python3 -m unittest discover -s tests/distro -p 'test_*.py' -v
+            touch "$out"
+          '';
+
+          embeddedIngestTest = pkgs.runCommand "starintel-embedded-ingest-test"
+            {
+              nativeBuildInputs = [ embeddedIngestLisp ];
+            } ''
+            export HOME="$TMPDIR/home"
+            export STARINTEL_EDGE_TEST_TMPDIR="$TMPDIR/test/"
+            mkdir -p "$HOME" "$STARINTEL_EDGE_TEST_TMPDIR"
+            sbcl --noinform --disable-debugger \
+              --script ${self}/tests/distro/embedded_ingest_test.lisp
+            touch "$out"
+          '';
+
+          systemApiTest = pkgs.runCommand "starintel-system-api-test"
+            {
+              nativeBuildInputs = [ pkgs.sbcl ];
+            } ''
+            export HOME="$TMPDIR/home"
+            mkdir -p "$HOME"
+            cd ${self}
+            sbcl --noinform --disable-debugger --script tests/system_api.lisp
+            touch "$out"
+          '';
+        in
+        {
           inherit pkgs android eclHost eclX86_64 eclArm64
-            runtimeX86_64 runtimeArm64 runtimeDiagnosticApk hostAdapterTest;
+            runtimeX86_64 runtimeArm64 runtimeDiagnosticApk hostAdapterTest
+            spec edgeRuntime embeddedIngest edgeIngest installer installerTest
+            embeddedIngestTest systemApiTest;
         };
-    in {
+    in
+    {
       packages = forAllSystems (system:
         let p = mkPackages system;
         in {
+          tek9 = tek9.packages.${system}.tek9;
+          edge-runtime = p.edgeRuntime;
+          embedded-ingest = p.embeddedIngest;
+          starintel-edge-ingest = p.edgeIngest;
+          starintel-installer = p.installer;
+          default =
+            if system == "x86_64-linux"
+            then p.runtimeX86_64
+            else p.edgeIngest;
+        } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
           android-ecl-x86_64 = p.eclX86_64;
           android-ecl-arm64-v8a = p.eclArm64;
           android-runtime-x86_64 = p.runtimeX86_64;
           android-runtime-arm64-v8a = p.runtimeArm64;
           android-runtime-diagnostic-apk = p.runtimeDiagnosticApk;
-          default = p.runtimeX86_64;
         });
 
       checks = forAllSystems (system:
         let p = mkPackages system;
         in {
+          installer-test = p.installerTest;
+          embedded-ingest-test = p.embeddedIngestTest;
+          system-api-test = p.systemApiTest;
+        } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
           host-adapter-test = p.hostAdapterTest;
+        });
+
+      apps = forAllSystems (system: {
+        starintel-installer = {
+          type = "app";
+          program = "${self.packages.${system}.starintel-installer}/bin/starintel-install";
+        };
+      });
+
+      nixosModules.default = { pkgs, ... }@args:
+        import ./distro/nixos/module.nix (args // {
+          starintelPackages = {
+            inherit (mkPackages pkgs.system) spec edgeIngest installer;
+          };
         });
 
       devShells = forAllSystems (system:
         let p = mkPackages system;
         in {
-          default = p.pkgs.mkShell {
-            packages = [
+          default = p.pkgs.mkShell ({
+            packages = [ p.installer p.edgeIngest ]
+              ++ nixpkgs.lib.optionals (system == "x86_64-linux") [
               p.pkgs.ecl
               p.pkgs.cmake
               p.pkgs.ninja
@@ -493,9 +633,10 @@
               p.android.androidsdk
               p.android.ndk-bundle
             ];
+          } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
             ANDROID_SDK_ROOT = "${p.android.androidsdk}/libexec/android-sdk";
             STARINTEL_ANDROID_NDK = "${p.android.ndk-bundle}/libexec/android-sdk/ndk/28.2.13676358";
-          };
+          });
         });
     };
 }

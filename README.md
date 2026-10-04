@@ -7,6 +7,17 @@ Raspberry Pi/Linux SBCs, Android, smart glasses (including Meta integrations), a
 watches. Downstream distributions and products consume pinned revisions of this
 repository; they must not maintain independent copies of edge runtime behavior.
 
+This repository also ships a custom, headlessly installable StarIntel
+distribution with `edge`, `actors`, and `full` profiles. The Edge profile uses
+ZeroMQ and the embedded Tek9/LMDB database rather than RabbitMQ. See
+[the distribution and actor-package contract](docs/DISTRIBUTION.md).
+
+Attax-OS uses a typed Common Lisp system API for geo providers, Wi-Fi and
+Bluetooth recon, canonical StarIntel document ingest, managed actor services,
+and the canonical Hackmode adapter. Plans target Debian, NixOS, and Termux;
+missing platform providers remain unavailable. Lish is the configured default
+shell, pending an immutable source/package pin for image bundling.
+
 ## Ownership
 
 - Common Lisp owns shared runtime semantics and APIs. Prolog/StarLang supply policy
@@ -33,6 +44,7 @@ See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
 | `contracts/` | Local JSON-LD target catalog and acceptance gates |
 | `tests/` | Common host and platform-facade conformance checks |
 | `downstream/` | Pinning, source migration, release and consumer rules |
+| `distro/` | Headless installer, actor package format, embedded ingest, and NixOS module |
 
 ## Target families
 
@@ -60,15 +72,15 @@ typed Kotlin Android/watch/glasses facades, target-family records, and contract
 tests. Missing device backends explicitly report unavailable; they do not
 simulate working devices.
 
-**Not yet implemented:** Android ECL/ART packaging, Android or watch diagnostic
-APKs, vendor SDK bindings, Raspberry Pi boot images, P2P runtime, or downstream
-migrations. Desktop JVM/contract tests are not Android, board, watch, or Meta
-hardware evidence.
+**Not yet implemented:** product Android integration, a watch APK, vendor SDK
+bindings, Raspberry Pi boot images, P2P runtime, or downstream migrations.
+Desktop JVM/contract tests are not board, watch, or Meta hardware evidence; the
+Edge diagnostic APK/emulator gate is not physical-device acceptance.
 
 | Remaining work | Tracking |
 | --- | --- |
 | Raspberry Pi/Nix service and hardware boot evidence | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
-| Android local ABCL runtime library and diagnostic APK | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
+| Android product integration and physical-device acceptance | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
 | Smart-glasses adapters and official Meta DAT integration | [#4](https://github.com/lost-rob0t/starintel-edge/issues/4) |
 | Wear OS local runtime, offline mode and optional relay | [#5](https://github.com/lost-rob0t/starintel-edge/issues/5) |
 | Pinned downstream artifacts, migration and release/promotion | [#6](https://github.com/lost-rob0t/starintel-edge/issues/6) |
