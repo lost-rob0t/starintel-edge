@@ -22,7 +22,7 @@ discovery or public listener.**
   transport without this private authentication/admission contract. This adapter
   does not claim legacy wire interoperability or silently weaken auth to provide it.
 - Canonical StarIntel documents remain generated from StarLang 0.10.1 at
-  `d6ca8780845c4296f64ac8e65aaa9db143842460`. Transport payloads are opaque octets:
+  `9198370f7a6f3e2a5ea00af3efdb6d705e102650`. Transport payloads are opaque octets:
   no parser, evaluator, document constructor, re-encoding or alternate schema.
   A real document actor must use the pinned generated contracts at its boundary.
 - The existing durable Edge outbox is intentionally not used as transport
