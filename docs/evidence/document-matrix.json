@@ -20,11 +20,11 @@
     "sbcl": "SBCL 2.2.9.debian",
     "nim": "Nim Compiler Version 2.2.4 [Linux: amd64]\nCompiled at 2025-04-22\nCopyright (c) 2006-2025 by Andreas Rumpf\n\ngit hash: f7145dd26efeeeb6eeae6fff649db244d81b212d\nactive boot switches: -d:release"
   },
-  "authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "authority_commit": "9198370f7a6f3e2a5ea00af3efdb6d705e102650",
   "sdk_provenance": {
     "python": {
       "tracked_worktree_clean": true,
-      "commit": "5096ab039cb240aae0057fbed8ae6a7667321bbf",
+      "commit": "7f81e1b39e933523fc671a47f606735c349b6a0f",
       "generated": {
         "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
         "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
@@ -35,7 +35,7 @@
     },
     "cl": {
       "tracked_worktree_clean": true,
-      "commit": "9f365eab1088242355686b640054a935c2b8a7f4",
+      "commit": "0c6240d6dd7fa608b69a90633767157faecde62e",
       "generated": {
         "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
         "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
@@ -46,7 +46,7 @@
     },
     "nim": {
       "tracked_worktree_clean": true,
-      "commit": "26f9fb4fbd54c4d72fc57c7450954a4fed3b6fec",
+      "commit": "c40b6e2cb0e9e3b4db68d5edb09ad57c5cba54cf",
       "generated": {
         "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
         "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",
@@ -57,7 +57,7 @@
     },
     "js": {
       "tracked_worktree_clean": true,
-      "commit": "8b15b2e0eb4d5562979a8d9b0565fe6eb70b82c4",
+      "commit": "4bf6eaa40f462e81fa3266aaf82f7371d3d817fd",
       "generated": {
         "schema.json": "1d677d679adcf64ed2df6e9e98eff47c3f66f67f10efbe4c4b69f7fffa2def0a",
         "portable-manifest.json": "b464f5af646ed7a7409cc8aec1c17d69c3d656d412c7ab5fbce6c83d42bc6c6f",

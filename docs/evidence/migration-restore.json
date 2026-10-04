@@ -1,14 +1,14 @@
 {
   "scope": "Explicit authority archival restore after every actual producer-to-consumer SDK wire path; not SDK legacy-reader support",
-  "authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "authority_commit": "9198370f7a6f3e2a5ea00af3efdb6d705e102650",
   "reference_authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
-  "reference_repository_commit": "ff8768960949d9ff7756760ca961e3ccd0bb1e9a",
+  "reference_repository_commit": "0fc9ad300ee91f4a3179b552a711d2400d8d5a6b",
   "reference_code_sha256": {
     "raw_json_numbers.py": "f4ea7fa656e97ab8d9055b5cd48ddcea34e2556c9ae91c0cb54d912c6a7767bb",
-    "versioned_reader.py": "d135028bca74987f162a2906a522904161e21d3cc9fee3f71b8ebbd72fd5464d"
+    "versioned_reader.py": "0a180ce4968da45843877fc1ce65045cafd6fd482a47fd6b7f16c3f8e24b860b"
   },
   "registry_sha256": "b2e92c76e8d5506490acf573e67f73d22244ea8490974221200643aa4046cd64",
-  "reference_sha256": "d135028bca74987f162a2906a522904161e21d3cc9fee3f71b8ebbd72fd5464d",
+  "reference_sha256": "0a180ce4968da45843877fc1ce65045cafd6fd482a47fd6b7f16c3f8e24b860b",
   "checks": [
     {
       "producer": "python",
