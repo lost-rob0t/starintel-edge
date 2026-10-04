@@ -1,0 +1,164 @@
+{
+  "scope": "Explicit authority archival restore after every actual producer-to-consumer SDK wire path; not SDK legacy-reader support",
+  "authority_commit": "9198370f7a6f3e2a5ea00af3efdb6d705e102650",
+  "reference_authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "reference_repository_commit": "0fc9ad300ee91f4a3179b552a711d2400d8d5a6b",
+  "reference_code_sha256": {
+    "raw_json_numbers.py": "f4ea7fa656e97ab8d9055b5cd48ddcea34e2556c9ae91c0cb54d912c6a7767bb",
+    "versioned_reader.py": "0a180ce4968da45843877fc1ce65045cafd6fd482a47fd6b7f16c3f8e24b860b"
+  },
+  "registry_sha256": "b2e92c76e8d5506490acf573e67f73d22244ea8490974221200643aa4046cd64",
+  "reference_sha256": "0a180ce4968da45843877fc1ce65045cafd6fd482a47fd6b7f16c3f8e24b860b",
+  "checks": [
+    {
+      "producer": "python",
+      "consumer": "python",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "js",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "cl",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "nim",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "python",
+      "consumer": "typescript",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "python",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "js",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "cl",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "nim",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "js",
+      "consumer": "typescript",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "python",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "js",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "cl",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "nim",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "cl",
+      "consumer": "typescript",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "python",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "js",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "cl",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "nim",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "nim",
+      "consumer": "typescript",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "python",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "js",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "cl",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "nim",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    },
+    {
+      "producer": "typescript",
+      "consumer": "typescript",
+      "restored_exact_originals": 34,
+      "status": "passed"
+    }
+  ]
+}

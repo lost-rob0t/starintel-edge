@@ -1,0 +1,13 @@
+name: StarIntel 0.10.1 contract
+on: [push, pull_request]
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: lost-rob0t/star-lang
+          ref: 9198370f7a6f3e2a5ea00af3efdb6d705e102650
+          path: .upstream-star-lang
+      - run: python3 scripts/sync-starintel-schema.py --source .upstream-star-lang

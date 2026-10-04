@@ -1,0 +1,56 @@
+{
+  "purpose": "failure characterization, not runtime acceptance",
+  "status": "unsafe-coexistence-reproduced",
+  "scenarios": [
+    {
+      "case": "pipe-no-ecl",
+      "exit_code": 0,
+      "timed_out": false,
+      "log": "reproduced-pipe-no-ecl.log.gz",
+      "sha256": "22e8b204fdc41d7286fe5e15d7fbadd2de689af31a8ce22e67f6d7ce152ab689",
+      "log_encoding": "gzip",
+      "sha256_domain": "decompressed log bytes"
+    },
+    {
+      "case": "pipe-with-ecl",
+      "exit_code": null,
+      "timed_out": true,
+      "timeout_seconds": 10,
+      "log": "reproduced-pipe-with-ecl.log.gz",
+      "sha256": "63555af5c16fef646fbaf0a9fb0f9917ee68adbf40b60dbc7552fa01156d763c",
+      "log_encoding": "gzip",
+      "sha256_domain": "decompressed log bytes"
+    },
+    {
+      "case": "interrupt-no-ecl",
+      "exit_code": 130,
+      "timed_out": false,
+      "log": "reproduced-interrupt-no-ecl.log.gz",
+      "sha256": "5af5f7c6dc4c99d8a46ee3efa4293fabadce041be33cf8936c53ea9fa30004fd",
+      "log_encoding": "gzip",
+      "sha256_domain": "decompressed log bytes"
+    },
+    {
+      "case": "interrupt-with-ecl",
+      "exit_code": null,
+      "timed_out": true,
+      "timeout_seconds": 10,
+      "log": "reproduced-interrupt-with-ecl.log.gz",
+      "sha256": "87117c2669e63691fd0322c4ae3641ee59d2bcac608c7460f6f99199fed435b7",
+      "log_encoding": "gzip",
+      "sha256_domain": "decompressed log bytes"
+    }
+  ],
+  "source_sha256": {
+    "probe.c": "990b50313d1b0cfdebee8d091f7a4a4efdc493559028143f14e5a8a99890e319",
+    "SignalProbe.java": "bd0afacb2dce1022405911cc52be97f8b98d428cc0dfb1af19a343a045affa7c"
+  },
+  "ecl_library_sha256": "90d3e60bae180877f216d9af9e5fa4daad8538320a000ef77fc8dc67daf62a1e",
+  "options": {
+    "libjsig_preloaded": true,
+    "ECL_OPT_TRAP_SIGINT": 0,
+    "VM_guards_disabled": false,
+    "fault_FPE_thread_interrupt_guards_disabled": false
+  },
+  "java": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-deb13u1-Debian)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-deb13u1-Debian, mixed mode, sharing)\n"
+}

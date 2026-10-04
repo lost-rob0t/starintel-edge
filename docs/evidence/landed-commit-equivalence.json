@@ -1,0 +1,56 @@
+[
+  {
+    "name": "python",
+    "path": "authority/starintel-doc-numeric",
+    "tested_local_commit": "7f81e1b39e933523fc671a47f606735c349b6a0f",
+    "local_tree": "539209efb84ad0c698817c04c4089cf39de4ea9c",
+    "published_commit": "6aa8051dc7ea560943a60a25e1d600467f2778bc",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  },
+  {
+    "name": "common_lisp",
+    "path": "authority/star-cl-numeric",
+    "tested_local_commit": "0c6240d6dd7fa608b69a90633767157faecde62e",
+    "local_tree": "f8a99c9c69b5bcba0caf3aef56c6a16f415140eb",
+    "published_commit": "77c56cfb44f5b6a88696971c1c78b2bfed3b589b",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  },
+  {
+    "name": "nim",
+    "path": "remaining/starintel-doc-numeric.nim",
+    "tested_local_commit": "c40b6e2cb0e9e3b4db68d5edb09ad57c5cba54cf",
+    "local_tree": "d49d159e575fd4735104fb09a7c3e76bc697f597",
+    "published_commit": "9fba9f60b7c2a50f52e7b6fbf918002d7aba9ab8",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  },
+  {
+    "name": "javascript_typescript",
+    "path": "remaining/starintel-doc-numeric.js",
+    "tested_local_commit": "4bf6eaa40f462e81fa3266aaf82f7371d3d817fd",
+    "local_tree": "2c21f6208064f677cf5c2bf5f5940affbcbe4602",
+    "published_commit": "33c4e311894d70cdcd277132181c3567fd9816fa",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  },
+  {
+    "name": "authority",
+    "path": "authority/star-lang-versioned",
+    "tested_local_commit": "0fc9ad300ee91f4a3179b552a711d2400d8d5a6b",
+    "local_tree": "515c884b2fdafd87f99dea100cb30978e998f4ae",
+    "published_commit": "e9ec1d883627d186aafe0b3647bdc29baea03543",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  },
+  {
+    "name": "edge",
+    "path": "runtime/starintel-edge-interop-final",
+    "tested_local_commit": "8362ea09c19e1a0525644a3f9bb42e3c1ac1a86c",
+    "local_tree": "6c3be1b45ad936491f009a55162a2d930dcfaa1b",
+    "published_commit": "feafc2ea9e960807759cc4d826f57b54e434a709",
+    "published_tree_local_object": null,
+    "equivalence_source": "landing coordinator exact-tree attestation; remote object absent locally"
+  }
+]

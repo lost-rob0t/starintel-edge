@@ -1,0 +1,145 @@
+(require :asdf)
+(asdf:load-asd (truename "runtime/starintel-edge.asd"))
+(asdf:load-system "starintel-edge/mesh-zmq")
+(load "tests/mesh.lisp")
+(in-package #:star.edge.mesh)
+;; No socket calls: synthetic ZAP credential-to-identity mapping only.
+(let* ((a (make-array 32 :element-type '(unsigned-byte 8) :initial-element 1))
+       (b (make-array 32 :element-type '(unsigned-byte 8) :initial-element 2))
+       (transport (make-zmq-transport :native-budget-check (lambda () nil)))
+       (*zmq-domains* (make-hash-table :test #'equal))
+       (frames (mapcar #'bytes '("1.0" "sequence" "local" "127.0.0.1" "spoof-routing-identity" "CURVE"))))
+  (setf (gethash "local" *zmq-domains*) transport (zmq-keys transport) (list (cons a "peer-a")))
+  (check (equal "peer-a" (authorized-zap-peer (append frames (list a)))))
+  (check (null (authorized-zap-peer (append frames (list b)))))
+  (check (null (authorized-zap-peer (append frames (list a a)))))
+  (setf (third frames) (bytes "unknown-domain"))
+  (check (null (authorized-zap-peer (append frames (list a)))))
+  (setf (third frames) (bytes "local") (sixth frames) (bytes "NULL"))
+  (check (null (authorized-zap-peer (append frames (list a)))))
+  (check (rejects (lambda () (transport-open transport (config) (lambda (x) (declare (ignore x)) nil)))))
+  (check (null *zmq-context*)))
+(cffi:use-foreign-library edge-libzmq)
+(check (= 1 (%zmq-has "curve")))
+
+;; Verifier inputs are synthetic syscalls/kernel aggregates only. No limit changes.
+#+(and sbcl linux 64-bit)
+(let ((original (symbol-function '%getrlimit)) (uid (symbol-function '%geteuid))
+      (observation (symbol-function 'read-linux-process-observation)))
+  (unwind-protect
+       (progn
+         (setf (symbol-function '%geteuid) (lambda () 1000)
+               (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 128 1024 1024) 0 0)))
+         (dolist (limits (list (list (* 256 1024 1024) (* 512 1024 1024) t)
+                              (list (* 256 1024 1024) (1- (expt 2 64)) nil)
+                              (list (* 5 1024 1024 1024) (* 5 1024 1024 1024) nil)
+                              (list (* 512 1024 1024) (* 256 1024 1024) nil)))
+           (setf (symbol-function '%getrlimit)
+                 (lambda (resource ptr)
+                   (check (= resource 9))
+                   (setf (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'current) (first limits)
+                         (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'maximum) (second limits)) 0))
+           (check (eq (third limits) (not (null (verify-linux-process-memory-limit))))))
+         (setf (symbol-function '%getrlimit)
+               (lambda (resource ptr)
+                 (declare (ignore resource))
+                 (setf (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'current) (* 256 1024 1024)
+                       (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'maximum) (* 512 1024 1024)) 0))
+         ;; Lowering RLIMIT_AS does not unmap existing reservations above it.
+         (setf (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 513 1024 1024) 0 0)))
+         (check (null (verify-linux-process-memory-limit)))
+         ;; Exactly-at-hard-limit is coherent; the soft limit can be below existing mappings.
+         (setf (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 512 1024 1024) 0 0)))
+         (check (verify-linux-process-memory-limit))
+         ;; Effective privilege is clear, but permitted CAP_SYS_RESOURCE can be regained.
+         (setf (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 128 1024 1024) (ash 1 24) 0)))
+         (check (null (verify-linux-process-memory-limit)))
+         (setf (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 128 1024 1024) (ash 1 24) (ash 1 24))))
+         (check (null (verify-linux-process-memory-limit)))
+         ;; Missing, inconsistent, or unreadable kernel observations fail closed.
+         (dolist (data (list (list nil 0 0) (list 0 0 0) (list (* 128 1024 1024) nil 0)
+                            (list (* 128 1024 1024) 0 1)))
+           (setf (symbol-function 'read-linux-process-observation) (lambda () (values-list data)))
+           (check (null (verify-linux-process-memory-limit))))
+         (setf (symbol-function 'read-linux-process-observation) (lambda () (error "unavailable")))
+         (check (null (verify-linux-process-memory-limit)))
+         ;; A limit change across the kernel observation cannot be attested as one snapshot.
+         (setf (symbol-function 'read-linux-process-observation)
+               (lambda () (values (* 128 1024 1024) 0 0)))
+         (let ((calls 0))
+           (setf (symbol-function '%getrlimit)
+                 (lambda (resource ptr)
+                   (declare (ignore resource)) (incf calls)
+                   (setf (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'current) (* 256 1024 1024)
+                         (cffi:foreign-slot-value ptr '(:struct linux-rlimit) 'maximum)
+                         (* (if (= calls 1) 512 384) 1024 1024)) 0))
+           (check (null (verify-linux-process-memory-limit)))))
+    (setf (symbol-function '%getrlimit) original (symbol-function '%geteuid) uid
+          (symbol-function 'read-linux-process-observation) observation)))
+
+;; Strict parsing uses aggregate kernel sizes/capability masks, never raw VMA addresses.
+(flet ((parse-status (text)
+         (with-input-from-string (stream text) (multiple-value-list (parse-linux-process-observation stream)))))
+  (check (equal (list (* 131072 1024) 0 0)
+                (parse-status (format nil "VmSize:~C131072 kB~%CapPrm:~C0000000000000000~%CapEff:~C0000000000000000~%" #\Tab #\Tab #\Tab))))
+  (dolist (text (list "CapPrm: 0" ; missing size/effective mask
+                     (format nil "VmSize: 131072 MB~%CapPrm: 0~%CapEff: 0~%")
+                     (format nil "VmSize: 131072 kB~%VmSize: 131072 kB~%CapPrm: 0~%CapEff: 0~%")
+                     (format nil "VmSize: +131072 kB~%CapPrm: 0~%CapEff: 0~%")
+                     (format nil "VmSize: 131072 kB~%CapPrm: garbage~%CapEff: 0~%")
+                     (format nil "VmSize: 131072 kB~%CapPrm: 0~%CapEff: 1~%")))
+    (check (rejects (lambda () (parse-status text))))))
+
+;; Pin continuity across close/resume, synthetic public keys only.
+(let* ((a (make-array 32 :element-type '(unsigned-byte 8) :initial-element 1))
+       (b (make-array 32 :element-type '(unsigned-byte 8) :initial-element 2))
+       (c (make-array 32 :element-type '(unsigned-byte 8) :initial-element 3))
+       (port (make-zmq-transport)))
+  (pin-zmq-enrollment port a (list (cons b "peer-a")))
+  (check (not (rejects (lambda () (pin-zmq-enrollment port a (list (cons b "peer-a")))))))
+  (check (rejects (lambda () (pin-zmq-enrollment port a (list (cons c "peer-a"))))))
+  (check (rejects (lambda () (pin-zmq-enrollment port c (list (cons b "peer-a")))))))
+
+;; Stale route reuse cannot redirect to another enrolled key. Spy only, no sockets.
+(let* ((port (make-zmq-transport)) (original (symbol-function 'send-multipart)) (selected nil)
+       (*zmq-owner* (bordeaux-threads:current-thread)))
+  (setf (zmq-owner port) *zmq-owner* (zmq-open-p port) t (zmq-config port) (config :peers (list (peer "peer-a") (peer "peer-b")))
+        (zmq-router port) :router (zmq-dealers port) '(("peer-a" . :pinned-a) ("peer-b" . :pinned-b)))
+  (unwind-protect
+       (progn
+         (setf (symbol-function 'send-multipart) (lambda (socket frames) (declare (ignore frames)) (setf selected socket) :sent))
+         (transport-send port "peer-a" (encode-message (request) (make-result :ok)) (bytes "now-owned-by-b"))
+         (check (eq :pinned-a selected)))
+    (setf (symbol-function 'send-multipart) original)))
+
+;; ZAP enforcement is part of actual startup configuration, not an optional flag.
+(let ((int (symbol-function 'option-int)) (bytes (symbol-function 'option-bytes)) (options nil))
+  (unwind-protect
+       (progn
+         (setf (symbol-function 'option-int) (lambda (socket option value &optional type)
+                                             (declare (ignore socket type)) (push (cons option value) options))
+               (symbol-function 'option-bytes) (lambda (&rest args) (declare (ignore args)) nil))
+         (configure-router-auth :socket (make-array 32 :element-type '(unsigned-byte 8)) "domain")
+         (check (equal '(93 . 1) (assoc 93 options))) (check (equal '(47 . 1) (assoc 47 options))))
+    (setf (symbol-function 'option-int) int (symbol-function 'option-bytes) bytes)))
+
+;; Wrong-thread public operations fail before changing state or pending data.
+(let* ((port (make-zmq-transport)) (mesh (runtime port)) (failures nil)
+       (*zmq-owner* (bordeaux-threads:current-thread)))
+  (setf (zmq-owner port) *zmq-owner* (mesh-state mesh) :running)
+  (let ((thread (bordeaux-threads:make-thread
+                 (lambda ()
+                   (setf failures (mapcar #'rejects
+                                         (list (lambda () (step-mesh mesh))
+                                               (lambda () (stop-mesh mesh))
+                                               (lambda () (submit-request mesh "peer-a" (request)))
+                                               (lambda () (take-result mesh "id")))))))))
+    (bordeaux-threads:join-thread thread))
+  (check (every #'identity failures)) (check (eq :running (getf (mesh-status mesh) :state)))
+  (check (zerop (getf (mesh-status mesh) :pending))))
+(format t "~D synthetic + native read-only/binding checks passed; no sockets/CURVE handshake tested.~%" *checks*)

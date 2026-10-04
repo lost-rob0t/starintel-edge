@@ -1,4 +1,5 @@
 /build/
+/platforms/android/*/build/
 *.fasl
 *.abcl
 *.jar
@@ -6,9 +7,13 @@
 *.aab
 *.aar
 .gradle/
+.kotlin/
 local.properties
 .env
 .env.*
 __pycache__/
 result
 result-*
+
+# Native host adapter creates an app-private-style compiler temporary directory.
+/tests/android/fixture/tmp/

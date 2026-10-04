@@ -1,0 +1,130 @@
+{
+  "description": "Unmodified Quicklisp archives at the same release URLs as flake.nix; SHA256 covers compressed archive bytes, not Nix unpacked NAR hashes.",
+  "sources": [
+    {
+      "name": "bordeaux-threads",
+      "url": "https://beta.quicklisp.org/archive/bordeaux-threads/2024-10-12/bordeaux-threads-v0.9.4.tgz",
+      "sha256": "7646fe243a5f12274e7d3296b03b178c12c21d03f8eab4805147d6f1ecac3024"
+    },
+    {
+      "name": "alexandria",
+      "url": "https://beta.quicklisp.org/archive/alexandria/2024-10-12/alexandria-20241012-git.tgz",
+      "sha256": "dcdfc5bac229a952358dfe661f0860e8a02480e406d0d95dee4300cdc3d45b31"
+    },
+    {
+      "name": "global-vars",
+      "url": "https://beta.quicklisp.org/archive/global-vars/2014-11-06/global-vars-20141106-git.tgz",
+      "sha256": "f294843bb31144034e1370df1634dd74f24e617e3abb9c00c17927eda2ae4f2e"
+    },
+    {
+      "name": "trivial-features",
+      "url": "https://beta.quicklisp.org/archive/trivial-features/2025-06-22/trivial-features-20250622-git.tgz",
+      "sha256": "d8c9686e0425ea6f2cc8e18139a80bb082c44a23ac68fd455e5c74848b42257a"
+    },
+    {
+      "name": "trivial-garbage",
+      "url": "https://beta.quicklisp.org/archive/trivial-garbage/2023-10-21/trivial-garbage-20231021-git.tgz",
+      "sha256": "b29529bc3615ef373bcd8705b991709939dbcdf1071da494b1bf8e33c46d006a"
+    },
+    {
+      "name": "cl-ppcre",
+      "url": "https://beta.quicklisp.org/archive/cl-ppcre/2025-06-22/cl-ppcre-20250622-git.tgz",
+      "sha256": "a9d6a9ca9eb862283f6079856629c8b19254f108fcde065d61f280e7c2c6ec39"
+    },
+    {
+      "name": "cl-unicode",
+      "url": "https://beta.quicklisp.org/archive/cl-unicode/2024-10-12/cl-unicode-20241012-git.tgz",
+      "sha256": "8a4b2daff451054e6885de774fb27214e4a63b8595d4a30e4c6b1f6dab6a7d70"
+    },
+    {
+      "name": "flexi-streams",
+      "url": "https://beta.quicklisp.org/archive/flexi-streams/2024-10-12/flexi-streams-20241012-git.tgz",
+      "sha256": "f0437d3f4432e1ddab720da7de0df277baa7a05ec86fad297e00ec8045a3dd54"
+    },
+    {
+      "name": "trivial-gray-streams",
+      "url": "https://beta.quicklisp.org/archive/trivial-gray-streams/2024-10-12/trivial-gray-streams-20241012-git.tgz",
+      "sha256": "be7c33e82fdc8f4834b93b697df98a3b06486e6492928841dc26bb824d091cca"
+    },
+    {
+      "name": "cl-speedy-queue",
+      "url": "https://beta.quicklisp.org/archive/cl-speedy-queue/2015-03-02/cl-speedy-queue-20150302-git.tgz",
+      "sha256": "19e702425750c34e8914662aa21929dd8b25288ae4f1797730b9513027db03f1"
+    },
+    {
+      "name": "cl-gserver",
+      "url": "https://beta.quicklisp.org/archive/cl-gserver/2026-01-01/cl-gserver-20260101-git.tgz",
+      "sha256": "88c792ac65a7e9d7b3c75c6e8cf5df398561ecedc98292e319625f733b465de1"
+    },
+    {
+      "name": "log4cl",
+      "url": "https://beta.quicklisp.org/archive/log4cl/2023-06-18/log4cl-20230618-git.tgz",
+      "sha256": "c5061fecceeb57f5ab007175007e5714c8d654665a95362b992f64b4881e1118"
+    },
+    {
+      "name": "cl-str",
+      "url": "https://beta.quicklisp.org/archive/cl-str/2026-01-01/cl-str-20260101-git.tgz",
+      "sha256": "3ec7f98286ab52ac94995ef538d6fef7553dab87ab8e6ed88f93ff84351ca58b"
+    },
+    {
+      "name": "blackbird",
+      "url": "https://beta.quicklisp.org/archive/blackbird/2024-10-12/blackbird-20241012-git.tgz",
+      "sha256": "f9b58c4ee56ce76124e4260540e80122fdc226ecfc26426410515bd96b47c9a1"
+    },
+    {
+      "name": "binding-arrows",
+      "url": "https://beta.quicklisp.org/archive/binding-arrows/2024-10-12/binding-arrows-20241012-git.tgz",
+      "sha256": "3dc820df9d1fc056af1633b1e939ddbde7fb9deb18856f63d6389256f8d9a576"
+    },
+    {
+      "name": "timer-wheel",
+      "url": "https://beta.quicklisp.org/archive/timer-wheel/2026-01-01/timer-wheel-20260101-git.tgz",
+      "sha256": "0941f92bbf75a08860729c387a6400f8ab3026510f602f5e7f397cf3ecac866f"
+    },
+    {
+      "name": "local-time-duration",
+      "url": "https://beta.quicklisp.org/archive/local-time-duration/2018-04-30/local-time-duration-20180430-git.tgz",
+      "sha256": "0bea399a5a1e78800e843ae92e686eeba946d52dcf90074105f008046d27546f"
+    },
+    {
+      "name": "local-time",
+      "url": "https://beta.quicklisp.org/archive/local-time/2026-01-01/local-time-20260101-git.tgz",
+      "sha256": "6f476b13e7aa9e7a0fd81b527cd3771bca73ce16b025256df935a8f2ef063351"
+    },
+    {
+      "name": "esrap",
+      "url": "https://beta.quicklisp.org/archive/esrap/2026-01-01/esrap-20260101-git.tgz",
+      "sha256": "f58d5c62c315ea71d18b82c8e406eddf1359f97c035bddeb1a0ebf241ebac674"
+    },
+    {
+      "name": "trivial-with-current-source-form",
+      "url": "https://beta.quicklisp.org/archive/trivial-with-current-source-form/2026-01-01/trivial-with-current-source-form-20260101-git.tgz",
+      "sha256": "afe2d4b5f811de1e72f6096d76f3140079bd5384aec7e7b1a26b178d7a2f7d7a"
+    },
+    {
+      "name": "atomics",
+      "url": "https://beta.quicklisp.org/archive/atomics/2026-01-01/atomics-20260101-git.tgz",
+      "sha256": "04203c47ff34e98944931a587a3b6da73a604dbae7a77b141a89c1711224384a"
+    },
+    {
+      "name": "documentation-utils",
+      "url": "https://beta.quicklisp.org/archive/documentation-utils/2026-01-01/documentation-utils-20260101-git.tgz",
+      "sha256": "a2318cd2da66a7761f5ac389955563d127d70366491bd3e3f26413d1f8503ad8"
+    },
+    {
+      "name": "trivial-indent",
+      "url": "https://beta.quicklisp.org/archive/trivial-indent/2026-01-01/trivial-indent-20260101-git.tgz",
+      "sha256": "3f1e99a46fbb00dad37bb5f34ce5057901c1ceaf8f224dcfdfe9cebe136d3961"
+    },
+    {
+      "name": "cl-change-case",
+      "url": "https://beta.quicklisp.org/archive/cl-change-case/2025-06-22/cl-change-case-20250622-git.tgz",
+      "sha256": "51de260269e65df403ad515447369501b4e3ebfe98d507fa4b55c186128670ac"
+    },
+    {
+      "name": "vom",
+      "url": "https://beta.quicklisp.org/archive/vom/2024-10-12/vom-20241012-git.tgz",
+      "sha256": "4a8525d41467fac959e2df18c7ed60f83907dc25dd12b29a0244db05fde7de69"
+    }
+  ]
+}

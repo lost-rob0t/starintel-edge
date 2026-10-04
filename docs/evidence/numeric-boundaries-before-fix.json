@@ -1,0 +1,158 @@
+{
+  "status": "failed",
+  "authority_commit": "d6ca8780845c4296f64ac8e65aaa9db143842460",
+  "scope": "Additional schema-valid raw number boundary cases; not covered by the passing portable matrix",
+  "probe_sha256": "2c74826920eceacbe52e1f43c9238d99ec7e2ff4b24a48e257f9fed4e50955dc",
+  "checks": [
+    {
+      "language": "python",
+      "field": "createdAt",
+      "raw_value": "9223372036854775808",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\": \"fixture:numeric\", \"dataset\": \"interop-synthetic\", \"dtype\": \"person\", \"schemaVersion\": \"0.10.1\", \"createdAt\": 9223372036854775808}",
+      "error": ""
+    },
+    {
+      "language": "js",
+      "field": "createdAt",
+      "raw_value": "9223372036854775808",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"createdAt\":9223372036854775808}",
+      "error": ""
+    },
+    {
+      "language": "cl",
+      "field": "createdAt",
+      "raw_value": "9223372036854775808",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"createdAt\":9223372036854775808}",
+      "error": ""
+    },
+    {
+      "language": "nim",
+      "field": "createdAt",
+      "raw_value": "9223372036854775808",
+      "exit_code": 1,
+      "exact_numeric_value": false,
+      "status": "failed",
+      "actual_wire": "",
+      "error": "$.createdAt: expected integer\n"
+    },
+    {
+      "language": "typescript",
+      "field": "createdAt",
+      "raw_value": "9223372036854775808",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"createdAt\":9223372036854775808}",
+      "error": ""
+    },
+    {
+      "language": "python",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"fraction\":0.12345678901234567890123456789}}",
+      "exit_code": 0,
+      "exact_numeric_value": false,
+      "status": "failed",
+      "actual_wire": "{\"id\": \"fixture:numeric\", \"dataset\": \"interop-synthetic\", \"dtype\": \"person\", \"schemaVersion\": \"0.10.1\", \"extensions\": {\"probe\": {\"fraction\": 0.12345678901234568}}}",
+      "error": ""
+    },
+    {
+      "language": "js",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"fraction\":0.12345678901234567890123456789}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"fraction\":0.12345678901234567890123456789}}}",
+      "error": ""
+    },
+    {
+      "language": "cl",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"fraction\":0.12345678901234567890123456789}}",
+      "exit_code": 0,
+      "exact_numeric_value": false,
+      "status": "failed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"fraction\":0.12345678901234569}}}",
+      "error": ""
+    },
+    {
+      "language": "nim",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"fraction\":0.12345678901234567890123456789}}",
+      "exit_code": 0,
+      "exact_numeric_value": false,
+      "status": "failed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"fraction\":0.12345678901234568}}}",
+      "error": ""
+    },
+    {
+      "language": "typescript",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"fraction\":0.12345678901234567890123456789}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"fraction\":0.12345678901234567890123456789}}}",
+      "error": ""
+    },
+    {
+      "language": "python",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"integer\":9223372036854775809}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\": \"fixture:numeric\", \"dataset\": \"interop-synthetic\", \"dtype\": \"person\", \"schemaVersion\": \"0.10.1\", \"extensions\": {\"probe\": {\"integer\": 9223372036854775809}}}",
+      "error": ""
+    },
+    {
+      "language": "js",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"integer\":9223372036854775809}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"integer\":9223372036854775809}}}",
+      "error": ""
+    },
+    {
+      "language": "cl",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"integer\":9223372036854775809}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"integer\":9223372036854775809}}}",
+      "error": ""
+    },
+    {
+      "language": "nim",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"integer\":9223372036854775809}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"integer\":9223372036854775809}}}",
+      "error": ""
+    },
+    {
+      "language": "typescript",
+      "field": "extensions",
+      "raw_value": "{\"probe\":{\"integer\":9223372036854775809}}",
+      "exit_code": 0,
+      "exact_numeric_value": true,
+      "status": "passed",
+      "actual_wire": "{\"id\":\"fixture:numeric\",\"dataset\":\"interop-synthetic\",\"dtype\":\"person\",\"schemaVersion\":\"0.10.1\",\"extensions\":{\"probe\":{\"integer\":9223372036854775809}}}",
+      "error": ""
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+{
+  "production_sha256": {
+    "runtime/actors.lisp": "4c880521fdd769adce3047d8b9b04a02285d6dd8e1dade8ec3cde2f8ab24b5e2",
+    "runtime/android-service.lisp": "4729c5908ecc3467d0f0e891a9d6ce70da12956f9484e2772047491feba5957d",
+    "runtime/android.lisp": "4c0e0d382a2f3d439a990d39d89e7a46f57e235cf8b560b91678c15851e5d47a",
+    "runtime/host.lisp": "08338cbb8765566ae298668474561da4c013deb92966c2d5488367ed0c525143",
+    "runtime/lifecycle.lisp": "923df08b3e43af303c5fb14bf83c0d4075dd1385009e342a68390e753c61d43a",
+    "runtime/linux.lisp": "6526ac48bec50e1b6eef95f67f0dfcc51a0b5411e39c4d16013ddc04a678196b",
+    "runtime/mesh-package.lisp": "a986531df2b742526c672044f1aba5a2f0cb2c68cda51943d43894029dee94e1",
+    "runtime/mesh-runtime.lisp": "c987b952fa5b65607297b3d5d508a69e17a34c7ac25749e507786ffa63acac51",
+    "runtime/mesh-sento.lisp": "65886b977a5e7385fd8b4dd621ddb7325dfeacdb94dbe4748b2d64a3177ca33f",
+    "runtime/mesh-zmq.lisp": "a23960f1347d17d46e75c8008b6db99daaa5901238c93238437cf61d01cd6b39",
+    "runtime/mesh.lisp": "6e31ade55c2a7552db363c94a4644642cc1785ae68339f0208b62fb8803b713c",
+    "runtime/outbox.lisp": "993822a2b3c1ccf17c4040497b614760dc444bc06522a7d66ce2a87c2622b770",
+    "runtime/package.lisp": "19aff2e4d432ccdaaf91b8f0a062ca3f1426e798bd0ef753643b9c73e3f6137d",
+    "runtime/power.lisp": "242e087cae1aca86dc3b32235eefca0f0886a257c8d9cb525c531fcc00207121",
+    "runtime/runtime-package.lisp": "8621d4292d86e137643eeb4f42f0c8bf6cc1eea536e1350e25e1144356eb5365",
+    "runtime/starintel-edge.asd": "d5657b35996201ef1946190a6471202300583d63680313dbb93a609bc2e0fc64",
+    "platforms/android/native/starintel_ecl_adapter.c": "ba69a73903ec1b279fe9c7a6dae3d6137b8583b202ba07f711071136fe81f095",
+    "platforms/android/native/starintel_ecl_adapter.h": "e20554cd3136f7c41c28334d502f5d75484ab91a73977b7a98551bbff3eb524b",
+    "platforms/android/native/starintel_ecl_envelope.h": "d1fa5fda11cbb795f7d65b6a061d6afe9e27b0526314686484d0eb4c8ea32374",
+    "platforms/android/native/starintel_ecl_jni.c": "99e69874207b7ae9bb486716b4e25f1f4caebb96c588f4837d7075086839db87",
+    "platforms/android/native/starintel_utf.h": "6bd9dcb26fd3d64d14e6c1f625d16949029c6ec53da9dc4fd42390fc56c89649",
+    "platforms/android/kotlin/actor/starintel/edge/StarIntelEdgeRuntime.kt": "10f3253199f85c537418d25fafdcd189b2d0b1bb8e2c413b53b478524ff3739b",
+    "tools/host-lisp-sources.json": "4cee3403ca89e2c3319a26fb27073659ee2820dc67dae4b5ae1028b6a2f6cf78"
+  },
+  "harness_sha256": {
+    "tests/interop/actor/JavaActorClient.java": "815923c74b54686b37d4566c3214a6891f33c6b4e03897c3269bb4f6f0258541",
+    "tests/interop/actor/KotlinActorClient.kt": "e1dfc6c1f62f6cfefc092e33b5c8c69266269694114b9bb029af30d07b55ed79",
+    "tests/interop/actor/client.c": "a79b6557e831e4ae1cfe790bcc70e6d5901e3901f466041d76a6e8371c692708",
+    "tests/interop/actor/startup.lisp": "4cd4c202608ce18fc733e6a9d45297c40921404a5a4d891c1b3708c3c47702ef",
+    "tests/interop/actor_interop.py": "23db9eafad2c19f77f4e365e9ff47e1886d270c930df90cd220578ff8561d054",
+    "tests/interop/actor_mesh.lisp": "d8d79a67cd49b54a1b845a2b5cc1d07721d44521b9d0f09bb77d2047dc9b53f1"
+  },
+  "document_sources": {
+    "python": {
+      "path": "/tmp/edge-interop-verified/python-valid.ndjson",
+      "sha256": "98d8b767666cf7031b6794f49014566ca083ebb6f4af6908f413429efd663045",
+      "records": [
+        "person",
+        "message"
+      ]
+    },
+    "js": {
+      "path": "/tmp/edge-interop-verified/js-valid.ndjson",
+      "sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7",
+      "records": [
+        "person",
+        "message"
+      ]
+    },
+    "typescript": {
+      "path": "/tmp/edge-interop-verified/typescript-valid.ndjson",
+      "sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7",
+      "records": [
+        "person",
+        "message"
+      ]
+    },
+    "cl": {
+      "path": "/tmp/edge-interop-verified/cl-valid.ndjson",
+      "sha256": "be82fd7f908200bc044dd6f478c194176d99c4e5c4dd3557eba49dcdf7e14645",
+      "records": [
+        "person",
+        "message"
+      ]
+    },
+    "nim": {
+      "path": "/tmp/edge-interop-verified/nim-valid.ndjson",
+      "sha256": "7f23c8f380c8dd4aeda99dea820ed578e736639fd93915a3921eae53ffc12eb7",
+      "records": [
+        "person",
+        "message"
+      ]
+    }
+  },
+  "toolchains": {
+    "sbcl": "SBCL 2.2.9.debian",
+    "cc": "cc (Debian 14.2.0-19) 14.2.0",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-deb13u1-Debian)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-deb13u1-Debian, mixed mode, sharing)",
+    "kotlin": "info: kotlinc-jvm 2.2.10 (JRE 21.0.12.1+1-1-deb13u1-Debian)\nwarning: unable to find kotlin-stdlib.jar in the Kotlin home directory. Pass either '-no-stdlib' to prevent adding it to the classpath, or the correct '-kotlin-home'\nwarning: unable to find kotlin-script-runtime.jar in the Kotlin home directory. Pass either '-no-stdlib' to prevent adding it to the classpath, or the correct '-kotlin-home'\nwarning: unable to find kotlin-reflect.jar in the Kotlin home directory. Pass either '-no-reflect' or '-no-stdlib' to prevent adding it to the classpath, or the correct '-kotlin-home'",
+    "kotlin_stdlib_sha256": "9c67cc79efd6b9215b49d2a4308f5f3433537376c7c88e89bdd6729bd096e61a",
+    "lmdb_sha256": "3deeea5a5884a3c3f32fcada4c8c805bbf246eda438c8f2fe3a5cf6c6208c984"
+  },
+  "command_logs": [
+    {
+      "log": "01.log",
+      "returncode": 0
+    },
+    {
+      "log": "02.log",
+      "returncode": 0
+    },
+    {
+      "log": "03.log",
+      "returncode": 0
+    },
+    {
+      "log": "04.log",
+      "returncode": 0
+    },
+    {
+      "log": "05.log",
+      "returncode": 0
+    },
+    {
+      "log": "06.log",
+      "returncode": 0
+    },
+    {
+      "log": "07.log",
+      "returncode": 0
+    },
+    {
+      "log": "08.log",
+      "returncode": 0
+    },
+    {
+      "log": "09.log",
+      "returncode": 0
+    },
+    {
+      "log": "10.log",
+      "returncode": 0
+    },
+    {
+      "log": "11.log",
+      "returncode": 0
+    },
+    {
+      "log": "12.log",
+      "returncode": 0
+    },
+    {
+      "log": "13.log",
+      "returncode": 0
+    },
+    {
+      "log": "14.log",
+      "returncode": 0
+    },
+    {
+      "log": "15.log",
+      "returncode": 0
+    },
+    {
+      "log": "16.log",
+      "returncode": 0
+    },
+    {
+      "log": "17.log",
+      "returncode": 0
+    }
+  ],
+  "scope": "host-only real actor adapters; no ART/device/network evidence",
+  "mode": "full",
+  "paths": [
+    {
+      "path": "Common Lisp/SBCL \u2192 real Sento \u2192 Common Lisp",
+      "status": "passed",
+      "responses": 32,
+      "extra_client_checks": 0,
+      "runtime": [
+        {
+          "implementation": "SBCL",
+          "version": "2.2.9.debian",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": []
+    },
+    {
+      "path": "Common Lisp real Sento actors over synthetic mesh transport",
+      "status": "passed",
+      "checks": 135,
+      "network": false
+    },
+    {
+      "path": "C \u2192 production C ABI/ECL \u2192 real Sento \u2192 C (raw JSON)",
+      "status": "passed",
+      "responses": 42,
+      "extra_client_checks": 2,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": []
+    },
+    {
+      "path": "C \u2192 production C ABI/ECL \u2192 real Sento \u2192 C (escaped JSON)",
+      "status": "passed",
+      "responses": 42,
+      "extra_client_checks": 2,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": []
+    },
+    {
+      "path": "Java \u2192 production Kotlin/JNI/C/ECL \u2192 real Sento \u2192 Java (raw JSON)",
+      "status": "passed_with_runtime_warnings",
+      "responses": 39,
+      "extra_client_checks": 6,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": [
+        "OpenJDK 64-Bit Server VM warning: MXCSR changed by native JNI code, use -XX:+RestoreMXCSROnJNICall",
+        "Warning: SIGBUS handler modified!",
+        "Warning: SIGFPE handler modified!",
+        "Warning: SIGILL handler modified!",
+        "Warning: SIGSEGV handler modified!"
+      ]
+    },
+    {
+      "path": "Java \u2192 production Kotlin/JNI/C/ECL \u2192 real Sento \u2192 Java (escaped JSON)",
+      "status": "passed_with_runtime_warnings",
+      "responses": 39,
+      "extra_client_checks": 6,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": [
+        "OpenJDK 64-Bit Server VM warning: MXCSR changed by native JNI code, use -XX:+RestoreMXCSROnJNICall",
+        "Warning: SIGBUS handler modified!",
+        "Warning: SIGFPE handler modified!",
+        "Warning: SIGILL handler modified!",
+        "Warning: SIGSEGV handler modified!"
+      ]
+    },
+    {
+      "path": "Kotlin \u2192 production Kotlin/JNI/C/ECL \u2192 real Sento \u2192 Kotlin (raw JSON)",
+      "status": "passed_with_runtime_warnings",
+      "responses": 39,
+      "extra_client_checks": 6,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": [
+        "OpenJDK 64-Bit Server VM warning: MXCSR changed by native JNI code, use -XX:+RestoreMXCSROnJNICall",
+        "Warning: SIGBUS handler modified!",
+        "Warning: SIGFPE handler modified!",
+        "Warning: SIGILL handler modified!",
+        "Warning: SIGSEGV handler modified!"
+      ]
+    },
+    {
+      "path": "Kotlin \u2192 production Kotlin/JNI/C/ECL \u2192 real Sento \u2192 Kotlin (escaped JSON)",
+      "status": "passed_with_runtime_warnings",
+      "responses": 39,
+      "extra_client_checks": 6,
+      "runtime": [
+        {
+          "implementation": "ECL",
+          "version": "26.5.5",
+          "sento": "3.4.2",
+          "bordeaux-threads": "0.9.4"
+        }
+      ],
+      "runtime_warnings": [
+        "OpenJDK 64-Bit Server VM warning: MXCSR changed by native JNI code, use -XX:+RestoreMXCSROnJNICall",
+        "Warning: SIGBUS handler modified!",
+        "Warning: SIGFPE handler modified!",
+        "Warning: SIGILL handler modified!",
+        "Warning: SIGSEGV handler modified!"
+      ]
+    }
+  ],
+  "status": "passed_with_runtime_warnings",
+  "runtime_safety_gate": "not-established",
+  "source_revision": "48ac2b3c52e5a69195ee7ea5bb72d55b6669888f"
+}
