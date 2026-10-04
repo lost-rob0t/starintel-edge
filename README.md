@@ -18,6 +18,10 @@ and the canonical Hackmode adapter. Plans target Debian, NixOS, and Termux;
 missing platform providers remain unavailable. Lish is the configured default
 shell, pending an immutable source/package pin for image bundling.
 
+Actor packages can register named Sento services and expose authorized
+start/stop/status operations through `star.edge.system`; Edge reuses its one
+process-owned actor system rather than creating a distribution-only supervisor.
+
 ## Ownership
 
 - Common Lisp owns shared runtime semantics and APIs. Prolog/StarLang supply policy

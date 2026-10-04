@@ -22,6 +22,7 @@
   :serial t
   :components ((:file "runtime-package")
                (:file "actors")
+               (:file "actor-services")
                (:file "lifecycle")
                (:file "outbox")
                (:file "power")

@@ -53,6 +53,15 @@ initial capability families are:
 - actor service start/stop/status; and
 - the canonical Hackmode capability API.
 
+Installed Lisp actor packages register named services with
+`star.edge.actors:register-actor-service`, or use
+`register-sento-actor-service` for a single root actor. Start, stop, and status
+then flow through the same live authorization check as other system effects.
+The adapter reuses the process-owned Sento actor system, registers the running
+root for normal target routing, stops that actor through Sento, and never starts
+a second supervisor. Definitions remain installed across an actor-system
+restart, while their runtime state returns to `stopped`.
+
 Hackmode remains the owner of recon providers, operation state, and its actor
 runtime. Edge exposes a typed adapter rather than copying those implementations;
 the exact Hackmode package pin is still required before an image can claim it

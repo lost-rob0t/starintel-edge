@@ -15,9 +15,16 @@
    #:actor-of
    #:start-actor-index
    #:register-actor
+   #:unregister-actor
    #:get-dest-actor
    #:route-target
    #:define-actor
+   #:register-actor-service
+   #:register-sento-actor-service
+   #:unregister-actor-service
+   #:list-actor-services
+   #:dispatch-actor-service
+   #:make-actor-service-dispatcher
    #:start-publisher
    #:stop-publisher
    #:publish
