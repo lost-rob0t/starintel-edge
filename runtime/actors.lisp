@@ -52,7 +52,8 @@ Replaces the server's nhooks-backed hook with a plain list.")
         (warn "Edge actor system shutdown failed: ~a" condition)))
     (setf *actor-system* nil
           *actor-index-agent* nil
-          *publisher-agent* nil))
+          *publisher-agent* nil)
+    (mark-actor-services-stopped))
   t)
 
 (defun actor-of (&key name receive)
@@ -76,6 +77,14 @@ Replaces the server's nhooks-backed hook with a plain list.")
   (sento.agent:agent-update *actor-index-agent*
                             (lambda (index)
                               (setf (gethash actor-name index) actor)
+                              index)))
+
+(defun unregister-actor (actor-name)
+  "Remove ACTOR-NAME from the routing index."
+  (unless *actor-index-agent* (error "Actor index is not running"))
+  (sento.agent:agent-update *actor-index-agent*
+                            (lambda (index)
+                              (remhash actor-name index)
                               index)))
 
 (defun get-dest-actor (actor-name)

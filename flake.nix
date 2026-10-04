@@ -357,8 +357,10 @@
                 cp -R ${ecl}/lib/ecl-${ecl.version}/. \
                   "$out/assets/starintel-edge/ecl/"
                 install -m644 runtime/starintel-edge.asd runtime/package.lisp \
-                  runtime/host.lisp runtime/runtime-package.lisp \
-                  runtime/actors.lisp runtime/lifecycle.lisp \
+                  runtime/host.lisp runtime/system-package.lisp \
+                  runtime/system-api.lisp runtime/runtime-package.lisp \
+                  runtime/actors.lisp runtime/actor-services.lisp \
+                  runtime/lifecycle.lisp \
                   runtime/outbox.lisp runtime/power.lisp runtime/linux.lisp \
                   runtime/android.lisp \
                   "$out/assets/starintel-edge/lisp/runtime/"
