@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://starintel.actor/schema/actor-lock-v1.json",
+  "title": "StarIntel actor package lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "packages"],
+  "properties": {
+    "format": {"const": "STARINTEL-ACTOR-LOCK/1"},
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version", "actorSystem", "entrypoint", "starintel", "github"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$"},
+          "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"},
+          "actorSystem": {"enum": ["sento", "pykka", "starlang"]},
+          "entrypoint": {"type": "string", "minLength": 1, "maxLength": 512},
+          "starintel": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["releaseVersion", "schemaVersion"],
+            "properties": {
+              "releaseVersion": {"type": "string"},
+              "schemaVersion": {"type": "string"}
+            }
+          },
+          "github": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "tag", "asset", "sha256"],
+            "properties": {
+              "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+              "tag": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]+$"},
+              "asset": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]+\\.tar\\.(?:gz|xz)$"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

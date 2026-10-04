@@ -18,7 +18,29 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "tek9": "tek9"
+      }
+    },
+    "tek9": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788232177,
+        "narHash": "sha256-AOHCJyhLDStfz18eIC15Vb4up3lzPAx0lCL8EwSfcs8=",
+        "ref": "refs/heads/master",
+        "rev": "1cb978084da8b4f1d184b3ef2a1d30057f525608",
+        "revCount": 130,
+        "type": "git",
+        "url": "https://git.starintel.actor/starintel-labs/tek9.git"
+      },
+      "original": {
+        "rev": "1cb978084da8b4f1d184b3ef2a1d30057f525608",
+        "type": "git",
+        "url": "https://git.starintel.actor/starintel-labs/tek9.git"
       }
     }
   },

@@ -7,7 +7,12 @@
   "canonical_key_style": "lowerCamelCase",
   "release_lock_path": "specs/starintel/0.10.1/release-lock.json",
   "schema_path": "specs/starintel/0.10.1/generated/schema.json",
-  "manifest_path": "specs/starintel/0.10.1/generated/portable-manifest.json",
+  "expansion_path": "specs/starintel/0.10.1/compatibility.json",
+  "manifest_path": "specs/starintel/0.10.1/schema-lock-manifest.json",
+  "portable_manifest_path": "specs/starintel/0.10.1/generated/portable-manifest.json",
+  "required_dtypes": [
+    "actor-manifest"
+  ],
   "vendored_files": {
     "schemas/starintel-0.10.1/compatibility-fixtures.json": {
       "source": "specs/starintel/0.10.1/compatibility-fixtures.json",

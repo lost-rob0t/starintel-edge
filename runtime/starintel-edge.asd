@@ -17,16 +17,27 @@
   :description "Canonical StarIntel edge runtime: Sento actor supervision, managed lifecycle, bounded durable outbox, power policy, Linux host backend"
   :version "0.1.0"
   :license "GPL-3.0-or-later"
-  :depends-on (#:sento #:bordeaux-threads #:starintel-edge)
+  :depends-on (#:sento #:bordeaux-threads #:starintel-edge
+               #:starintel-edge/system-api)
   :serial t
   :components ((:file "runtime-package")
                (:file "actors")
+               (:file "actor-services")
                (:file "lifecycle")
                (:file "outbox")
                (:file "power")
                (:file "linux")
                (:file "android")
                (:file "android-service")))
+
+(asdf:defsystem "starintel-edge/system-api"
+  :description "Typed Attax-OS system capabilities for Debian, NixOS, and Termux"
+  :version "0.1.0"
+  :license "GPL-3.0-or-later"
+  :serial t
+  :components ((:file "system-package")
+               (:file "system-api")))
+
 (asdf:defsystem "starintel-edge/mesh"
   :description "Private bounded actor transport semantics; host owns lifecycle"
   :depends-on ("starintel-edge")

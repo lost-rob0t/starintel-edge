@@ -64,6 +64,9 @@ def verify_release(commit: str, source: Path | None, read=None) -> tuple[dict, d
     manifest = json.loads(files[f"{RELEASE}/generated/portable-manifest.json"])
     require(manifest["library"]["name"] == release["authorityLibrary"], "manifest authority mismatch")
     require(manifest["library"]["version"] == release["releaseVersion"], "manifest version mismatch")
+    type_names = {entry.get("name") for entry in manifest.get("types", [])}
+    require(f"{release['authorityLibrary']}/actor-manifest" in type_names,
+            "canonical release is missing actor-manifest")
     return release, files
 
 
@@ -82,7 +85,10 @@ def sync(lock_path: Path, commit: str, source: Path | None, destination: str) ->
         "canonical_key_style": release["canonicalKeyStyle"],
         "release_lock_path": f"{RELEASE}/release-lock.json",
         "schema_path": f"{RELEASE}/generated/schema.json",
-        "manifest_path": f"{RELEASE}/generated/portable-manifest.json",
+        "expansion_path": f"{RELEASE}/compatibility.json",
+        "manifest_path": f"{RELEASE}/schema-lock-manifest.json",
+        "portable_manifest_path": f"{RELEASE}/generated/portable-manifest.json",
+        "required_dtypes": ["actor-manifest"],
         "vendored_files": {
             paths[path]: {"source": path, "sha256": digest(data)}
             for path, data in sorted(files.items())
@@ -120,8 +126,12 @@ def check(lock_path: Path, source: Path | None, *, offline: bool = False) -> dic
         require(lock[local] == release[canonical], f"consumer {local} mismatch")
     for name, expected in (("release_lock_path", f"{RELEASE}/release-lock.json"),
                            ("schema_path", f"{RELEASE}/generated/schema.json"),
-                           ("manifest_path", f"{RELEASE}/generated/portable-manifest.json")):
+                           ("expansion_path", f"{RELEASE}/compatibility.json"),
+                           ("manifest_path", f"{RELEASE}/schema-lock-manifest.json"),
+                           ("portable_manifest_path", f"{RELEASE}/generated/portable-manifest.json")):
         require(lock[name] == expected, f"consumer {name} mismatch")
+    require(lock.get("required_dtypes") == ["actor-manifest"],
+            "consumer required_dtypes mismatch")
     root = lock_path.resolve().parent.parent
     seen = set()
     for local, entry in lock["vendored_files"].items():

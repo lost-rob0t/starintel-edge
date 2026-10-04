@@ -12,6 +12,12 @@
 
 (defvar *actor-system* nil "The edge actor system.")
 
+(defvar *actor-index-agent* nil
+  "Agent holding a hash-table of registered actor names to actors.")
+
+(defvar *publisher-agent* nil
+  "Sento agent pinning the publish sink to one thread.")
+
 (defvar *actors-start-hook* nil
   "Functions to run after the actor system and index are started.
 Replaces the server's nhooks-backed hook with a plain list.")
@@ -53,7 +59,8 @@ Replaces the server's nhooks-backed hook with a plain list.")
                 nil))))
       (when (and (not confirmed) star.edge.runtime:*require-confirmed-shutdown*)
         (return-from stop-actor-system nil))
-      (setf *actor-system* nil *actor-index-agent* nil *publisher-agent* nil)))
+      (setf *actor-system* nil *actor-index-agent* nil *publisher-agent* nil)
+      (mark-actor-services-stopped)))
   t)
 
 (defun actor-of (&key name receive)
@@ -63,9 +70,6 @@ Replaces the server's nhooks-backed hook with a plain list.")
 
 ;;;; Actor index: actors must register here before receiving targets.
 ;;;; Adapted from starintel-server source/actors.lisp target routing.
-
-(defvar *actor-index-agent* nil
-  "Agent holding a hash-table of registered actor names to actors.")
 
 (defun start-actor-index (system)
   (declare (ignore system))
@@ -80,6 +84,14 @@ Replaces the server's nhooks-backed hook with a plain list.")
   (sento.agent:agent-update *actor-index-agent*
                             (lambda (index)
                               (setf (gethash actor-name index) actor)
+                              index)))
+
+(defun unregister-actor (actor-name)
+  "Remove ACTOR-NAME from the routing index."
+  (unless *actor-index-agent* (error "Actor index is not running"))
+  (sento.agent:agent-update *actor-index-agent*
+                            (lambda (index)
+                              (remhash actor-name index)
                               index)))
 
 (defun get-dest-actor (actor-name)
@@ -112,9 +124,6 @@ Replaces the server's nhooks-backed hook with a plain list.")
 
 ;;;; Publisher: bounded fail-fast publish through a pinned agent.
 ;;;; The sink port is injected; RabbitMQ remains a server-only transport.
-
-(defvar *publisher-agent* nil
-  "Sento agent pinning the publish sink to one thread.")
 
 (defparameter *publish-timeout-seconds* 5
   "Maximum time for a publish before failing fast instead of blocking callers.")

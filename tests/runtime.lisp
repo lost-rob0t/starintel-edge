@@ -165,6 +165,75 @@
                      (error "routed target never arrived"))
                    (sleep 0.01)))
         (check (equal (bt:with-lock-held (lock) (first mailbox)) "hello")))
+      ;; Named actor services reuse this Sento system and enter through the
+      ;; default-deny Common Lisp system API.
+      (let* ((lock (bt:make-lock "actor-service-test"))
+             (mailbox nil)
+             (allowed nil)
+             (api (star.edge.system:make-system-api
+                   :platform "nixos"
+                   :authorize (lambda (&rest ignored)
+                                (declare (ignore ignored))
+                                allowed))))
+        (star.edge.actors:register-sento-actor-service
+         "test-service"
+         (lambda (message)
+           (bt:with-lock-held (lock) (push message mailbox))))
+        (star.edge.system:install-standard-capabilities
+         api :actor-service-dispatch
+         (star.edge.actors:make-actor-service-dispatcher))
+        (check (eq :denied
+                   (getf (star.edge.system:call-system-api
+                          api "actor.service.start" '(:name "test-service"))
+                         :status)))
+        (check (null (star.edge.actors:get-dest-actor "test-service")))
+        (setf allowed t)
+        (let ((started (star.edge.system:call-system-api
+                        api "actor.service.start" '(:name "test-service"))))
+          (check (eq :ok (getf started :status)))
+          (check (eq :running (getf (getf started :value) :state))))
+        (star.edge.actors:route-target "service-message" "test-service")
+        (let ((deadline (+ (get-internal-real-time)
+                           internal-time-units-per-second)))
+          (loop until (bt:with-lock-held (lock) mailbox)
+                do (when (> (get-internal-real-time) deadline)
+                     (error "actor service message never arrived"))
+                   (sleep 0.01)))
+        (check (equal "service-message"
+                      (bt:with-lock-held (lock) (first mailbox))))
+        (check (eq :running
+                   (getf (getf (star.edge.system:call-system-api
+                                api "actor.service.status"
+                                '(:name "test-service"))
+                               :value)
+                         :state)))
+        ;; A root stopped by Sento is reconciled instead of reporting a stale
+        ;; running service, and the route is removed before restart.
+        (sento.actor-context:stop
+         sys (star.edge.actors:get-dest-actor "test-service") :wait t)
+        (check (eq :stopped
+                   (getf (getf (star.edge.system:call-system-api
+                                api "actor.service.status"
+                                '(:name "test-service"))
+                               :value)
+                         :state)))
+        (check (null (star.edge.actors:get-dest-actor "test-service")))
+        (check (eq :running
+                   (getf (getf (star.edge.system:call-system-api
+                                api "actor.service.start"
+                                '(:name "test-service"))
+                               :value)
+                         :state)))
+        (let ((stopped (star.edge.system:call-system-api
+                        api "actor.service.stop" '(:name "test-service"))))
+          (check (eq :ok (getf stopped :status)))
+          (check (eq :stopped (getf (getf stopped :value) :state))))
+        (check (null (star.edge.actors:get-dest-actor "test-service")))
+        (check (eq :unavailable
+                   (getf (star.edge.actors:dispatch-actor-service
+                          :status '(:name "not-installed"))
+                         :state)))
+        (star.edge.actors:unregister-actor-service "test-service"))
       ;; publish: fail-fast bounded publish through pinned agent
       (let ((sink-seen nil))
         (star.edge.actors:start-publisher
