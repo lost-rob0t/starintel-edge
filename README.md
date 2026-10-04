@@ -39,7 +39,7 @@ See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
 | Target | Execution model | Initial acceptance gate |
 | --- | --- | --- |
 | Raspberry Pi / Linux SBC | Local Common Lisp host; Nix packaging | Native and ARM boot/runtime tests |
-| Android phone / tablet | Local Common Lisp through the ABCL platform bridge | Android ART startup, lifecycle, offline, permission tests |
+| Android phone / tablet | Local Common Lisp through the reusable ECL/JNI runtime bundle | Android ART startup, lifecycle, offline, permission tests |
 | Android-based glasses | Local host where the vendor permits installation | Per-device install and SDK conformance tests |
 | Tethered/display glasses | Phone/compute-host runtime plus capability adapter | Per-device display/input/transport tests |
 | Meta glasses | Android companion integration through official Wearables Device Access Toolkit | SDK/device/version-specific permission, session, capture and optional display tests |
@@ -51,22 +51,28 @@ allow. In particular, a companion adapter does not imply that custom runtime cod
 can be installed directly on Meta glasses. Display capabilities are model- and
 SDK-dependent, not a blanket promise for all glasses.
 
-## Bootstrap status
+## Runtime status
 
-Implemented in this foundation: a Common Lisp forwarding/admission contract,
-typed Kotlin Android/watch/glasses facades, eight scaffold target-family records,
-contract tests and CI, and Nix packaging for the contract library. Missing runtime
-backends explicitly report unavailable; they do not simulate working devices.
+Implemented here: the Common Lisp forwarding/admission contract, Sento actor
+supervision, managed lifecycle with startup rollback and graceful shutdown, a
+bounded durable file outbox, a fail-closed power policy, the Linux host adapter,
+typed Kotlin Android/watch/glasses facades, target-family records, and contract
+tests. Missing device backends explicitly report unavailable; they do not
+simulate working devices.
 
-**Not implemented by this bootstrap:** actual actor-runtime extraction, ABCL/ART
-integration, Android or watch APKs, vendor SDK bindings, Raspberry Pi boot images,
-durable outbox, P2P runtime, or downstream migrations. Desktop JVM/contract tests
-are not hardware, Android, watch, or Meta integration tests.
+**Android runtime:** the ECL/LMDB/JNI bundle and native diagnostic source are
+present, with prior upstream evidence in [ANDROID-RUNTIME.md](docs/ANDROID-RUNTIME.md).
+A user-controlled foreground service and diagnostic app source are being integrated
+with that core. See [current service evidence](docs/ANDROID-SERVICE-EVIDENCE.md).
+This is not full star-server HTTP/CouchDB/RabbitMQ parity or new device acceptance.
+
+**Not yet implemented:** watch APKs, vendor SDK bindings, Raspberry Pi boot images,
+private mesh integration or public swarm. Desktop tests are not Android/device evidence.
 
 | Remaining work | Tracking |
 | --- | --- |
-| Common Lisp runtime extraction and Raspberry Pi/Nix host | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
-| Android local ABCL runtime library and diagnostic APK | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
+| Raspberry Pi/Nix service and hardware boot evidence | [#2](https://github.com/lost-rob0t/starintel-edge/issues/2) |
+| Android local ECL runtime service and diagnostic APK | [#3](https://github.com/lost-rob0t/starintel-edge/issues/3) |
 | Smart-glasses adapters and official Meta DAT integration | [#4](https://github.com/lost-rob0t/starintel-edge/issues/4) |
 | Wear OS local runtime, offline mode and optional relay | [#5](https://github.com/lost-rob0t/starintel-edge/issues/5) |
 | Pinned downstream artifacts, migration and release/promotion | [#6](https://github.com/lost-rob0t/starintel-edge/issues/6) |
@@ -85,3 +91,16 @@ Nix store paths, generated files, or CLI history.
 Downstream releases pin an exact upstream commit and artifact digest, verify
 provenance, and pass the same conformance suite before promotion. Compatibility
 wrappers forward; reusable fixes land here first.
+
+## StarIntel document contract
+
+See [the pinned 0.10.1 boundary](docs/STARINTEL-0101.md).
+
+## Experimental private actor mesh
+
+[Private mesh](docs/PRIVATE-MESH.md) adds optional Common Lisp/Sento request routing,
+explicit peer enrollment, bounded volatile delivery, and a CURVE/ZAP ZeroMQ adapter.
+Trusted local `init.lisp` is preserved. Public discovery/swarm mode is disabled.
+The real encrypted-host attempt was environment-blocked; Android acceptance remains open. Missing native
+libraries, credentials or verified process containment fail closed. The synthetic
+contract/actor tests do not establish a working device or production mesh.

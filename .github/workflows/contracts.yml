@@ -18,6 +18,8 @@ jobs:
         run: python3 tools/check_contracts.py
       - name: Common Lisp forwarding and deny-by-default contract
         run: sbcl --script tests/runtime.lisp
+      - name: Private mesh core semantics (synthetic transport only)
+        run: sbcl --script tests/mesh.lisp
       - name: Compile and test JVM facades (not Android or device coverage)
         run: |
           mkdir -p build
