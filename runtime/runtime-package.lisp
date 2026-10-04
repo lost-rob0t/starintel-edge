@@ -70,6 +70,7 @@
   (:export
    #:make-android-host
    #:install-adapter-host
+   #:shutdown-adapter-host
    #:adapter-host
    #:handle-request
    #:encode-json))

@@ -49,6 +49,14 @@ request entrypoint accepts bounded JSON and dispatches a closed operation name;
 there is no eval, arbitrary load, arbitrary symbol invocation, filesystem API,
 environment access, or shell access.
 
+Starting the adapter also starts the process-owned managed runtime and Sento
+actor system. `actor.list` projects only actors compiled into the trusted Edge
+image, and `actor.dispatch` resolves only those registered IDs. An `entrypoint`
+string supplied by a client remains inert data: it is never resolved or called.
+The base image exposes the infrastructure-only `runtime.echo` actor. Domain
+experts remain owned by their canonical expert packages and are unavailable
+until included in a trusted image.
+
 ## Acceptance gates
 
 | Gate | Status (2026-09-25) |
@@ -57,6 +65,7 @@ environment access, or shell access.
 | Both Android ABI packages build from the pinned Nix flake | Green — `android-runtime-x86_64` and `android-runtime-arm64-v8a` build with matched ECL 26.5.5 cross bootstraps, Android API 24 and NDK 28.2.13676358 |
 | x86_64 emulator loads the libraries inside ART and answers through the Kotlin/JNI boundary | Green — API 36 `emulator-5584`; UI and logcat report ECL boot, adapter ABI 1 and PASS |
 | Actor dispatch exercised locally with networking disabled | Green — Wi-Fi and mobile data disabled; `actor.roundtrip` delivers `android-local` through a real local Sento actor; diagnostic APK declares no Internet permission |
+| Managed actor catalog and closed dispatch | Green in host/ART diagnostics for the trusted `runtime.echo` actor; product/domain actors are not fabricated |
 | ARM64 build/package gate | Green — complete arm64-v8a runtime bundle cross-built from the same flake |
 | Product UI and physical-device claims | Out of scope; separate acceptance evidence required |
 

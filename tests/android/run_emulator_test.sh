@@ -16,6 +16,17 @@ android_user_home="$test_root/user"
 emulator_pid=
 
 cleanup() {
+    status=$?
+    set +e
+    if [ "$status" -ne 0 ]; then
+        printf 'Edge Android emulator diagnostic failed (exit %s)\n' "$status" >&2
+        if adb -s "$serial" get-state >/dev/null 2>&1; then
+            adb -s "$serial" logcat -d -t 200 >&2
+        fi
+        if [ -f "$test_root/emulator.log" ]; then
+            tail -n 200 "$test_root/emulator.log" >&2
+        fi
+    fi
     if [ -n "$emulator_pid" ]; then
         adb -s "$serial" emu kill >/dev/null 2>&1 || true
         wait "$emulator_pid" 2>/dev/null || true
@@ -24,6 +35,7 @@ cleanup() {
         /tmp/starintel-edge-emulator-test.*) find "$test_root" -depth -delete ;;
         *) printf 'Refusing to remove unexpected test path: %s\n' "$test_root" >&2 ;;
     esac
+    return "$status"
 }
 trap cleanup EXIT INT TERM
 
@@ -36,11 +48,43 @@ mkdir -p "$avd_home" "$android_user_home"
 export ANDROID_AVD_HOME="$avd_home"
 export ANDROID_USER_HOME="$android_user_home"
 
-avdmanager create avd --force \
-    --name starintel_edge_runtime \
-    --path "$avd_home/starintel_edge_runtime.avd" \
-    --package 'system-images;android-36;google_apis;x86_64' \
-    --device pixel_4 <<< no
+avd_dir="$avd_home/starintel_edge_runtime.avd"
+image_dir="$ANDROID_SDK_ROOT/system-images/android-36/google_apis/x86_64"
+test -f "$image_dir/system.img"
+mkdir -p "$avd_dir"
+printf '%s\n' \
+    'avd.ini.encoding=UTF-8' \
+    "path=$avd_dir" \
+    'target=android-36' \
+    > "$avd_home/starintel_edge_runtime.ini"
+printf '%s\n' \
+    'AvdId=starintel_edge_runtime' \
+    'PlayStore.enabled=false' \
+    'abi.type=x86_64' \
+    'avd.ini.displayname=StarIntel Edge runtime test' \
+    'disk.dataPartition.size=6G' \
+    'fastboot.forceColdBoot=yes' \
+    'fastboot.forceFastBoot=no' \
+    'hw.cpu.arch=x86_64' \
+    'hw.cpu.ncore=4' \
+    'hw.gpu.enabled=yes' \
+    'hw.gpu.mode=swiftshader_indirect' \
+    'hw.keyboard=yes' \
+    'hw.lcd.density=420' \
+    'hw.lcd.height=2400' \
+    'hw.lcd.width=1080' \
+    'hw.ramSize=2048' \
+    'image.sysdir.1=system-images/android-36/google_apis/x86_64/' \
+    'runtime.network.latency=none' \
+    'runtime.network.speed=full' \
+    'showDeviceFrame=no' \
+    'skin.dynamic=yes' \
+    'skin.name=1080x2400' \
+    'skin.path=_no_skin' \
+    'tag.display=Google APIs' \
+    'tag.id=google_apis' \
+    'vm.heapSize=576' \
+    > "$avd_dir/config.ini"
 
 apk_output=$(nix build .#android-runtime-diagnostic-apk \
     --no-link --print-out-paths)
@@ -106,5 +150,5 @@ if adb -s "$serial" shell dumpsys package actor.starintel.edge.diagnostic |
 fi
 adb -s "$serial" shell uiautomator dump /sdcard/starintel-edge.xml >/dev/null
 adb -s "$serial" shell cat /sdcard/starintel-edge.xml |
-    grep -q 'Local Sento actor round-trip passed'
+    grep -q 'Closed actor catalog + dispatch passed'
 printf '%s\n' "$diagnostic_log"

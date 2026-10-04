@@ -60,8 +60,16 @@ class RuntimeDiagnosticActivity : Activity() {
             check(actor.contains("\"message\":\"android-local\"")) {
                 "actor response was not local: $actor"
             }
+            val catalog = StarIntelEdgeRuntime.request("{\"op\":\"actor.list\"}")
+            check(catalog.contains("\"id\":\"runtime.echo\"")) {
+                "trusted actor catalog unavailable: $catalog"
+            }
+            val dispatch = StarIntelEdgeRuntime.request(
+                "{\"op\":\"actor.dispatch\",\"payload\":\"{\\\"actor_id\\\":\\\"runtime.echo\\\",\\\"message\\\":{}}\"}",
+            )
+            check(dispatch.contains("\"ok\":true")) { "actor dispatch failed: $dispatch" }
 
-            "PASS\n\nECL booted inside ART\nAdapter ABI 1\nLocal Sento actor round-trip passed\nNo network permission requested"
+            "PASS\n\nECL booted inside ART\nAdapter ABI 1\nManaged Sento runtime started\nClosed actor catalog + dispatch passed\nNo network permission requested"
         } catch (failure: Throwable) {
             Log.e(TAG, "Runtime diagnostic failed", failure)
             "FAIL\n\n${failure.javaClass.simpleName}: ${failure.message}"

@@ -34,6 +34,7 @@ extern void init_lib_ASDF(cl_object);
 static pthread_mutex_t starintel_ecl_lock = PTHREAD_MUTEX_INITIALIZER;
 static int starintel_ecl_started = 0;
 static cl_object starintel_ecl_dispatch_symbol = OBJNULL;
+static cl_object starintel_ecl_shutdown_symbol = OBJNULL;
 
 struct starintel_string {
     char *data; /* malloc'd, NUL-terminated */
@@ -449,7 +450,12 @@ int starintel_ecl_start(const char *runtime_directory, char **error)
     if (!failed)
         starintel_ecl_dispatch_symbol =
             find_lisp_symbol("STAR.EDGE.ANDROID", "HANDLE-REQUEST");
+    if (!failed)
+        starintel_ecl_shutdown_symbol =
+            find_lisp_symbol("STAR.EDGE.ANDROID", "SHUTDOWN-ADAPTER-HOST");
     if (starintel_ecl_dispatch_symbol == OBJNULL)
+        failed = 1;
+    if (starintel_ecl_shutdown_symbol == OBJNULL)
         failed = 1;
     if (failed) {
         cl_shutdown();
@@ -535,8 +541,12 @@ void starintel_ecl_stop(void)
 {
     pthread_mutex_lock(&starintel_ecl_lock);
     if (starintel_ecl_started) {
+        if (starintel_ecl_shutdown_symbol != OBJNULL)
+            (void)si_safe_eval(3, cl_list(1, starintel_ecl_shutdown_symbol),
+                               Cnil, OBJNULL);
         starintel_ecl_started = 0;
         starintel_ecl_dispatch_symbol = OBJNULL;
+        starintel_ecl_shutdown_symbol = OBJNULL;
         cl_shutdown();
     }
     pthread_mutex_unlock(&starintel_ecl_lock);

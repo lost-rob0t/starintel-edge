@@ -285,22 +285,35 @@
                                            #\tab #\newline)))
                     "{\"reason\":\"quote\\\"slash\\\\tab\\tnewline\\n\"}"))
     (check (string= (star.edge.android:encode-json '()) "[]"))
-    ;; uninstalled process host is honestly unavailable, never simulated
+    ;; Installing the Android adapter starts the process-owned managed runtime.
     (star.edge.android:install-adapter-host)
     (check (string= (star.edge.android:handle-request "runtime.ping" nil nil)
                     "{\"status\":\"ok\",\"runtime\":\"starintel-edge\",\"adapter-abi\":1,\"platform\":\"android\"}"))
     (check (string= (star.edge.android:handle-request "actor.roundtrip" nil nil)
                     "{\"status\":\"ok\",\"actor\":\"roundtrip\",\"message\":\"android-local\"}"))
     (check (string= (star.edge.android:handle-request "status" nil nil)
+                    "{\"status\":\"ok\",\"state\":\"running\"}"))
+    (check (search "\"id\":\"runtime.echo\""
+                   (star.edge.android:handle-request "actor.list" nil nil)))
+    (check (search "\"ok\":true"
+                   (star.edge.android:handle-request
+                    "actor.dispatch"
+                    "{\"actor_id\":\"runtime.echo\",\"message\":{}}"
+                    nil)))
+    (check (search "actor-unavailable"
+                   (star.edge.android:handle-request
+                    "actor.dispatch"
+                    "{\"actor_id\":\"not.installed\",\"message\":{}}"
+                    nil)))
+    (check (string= (star.edge.android:handle-request "stop" nil nil)
+                    "{\"status\":\"ok\",\"state\":\"stopped\"}"))
+    (check (string= (star.edge.android:handle-request "status" nil nil)
                     "{\"status\":\"unavailable\",\"reason\":\"runtime-not-attached\"}"))
-    (let ((rt (star.edge.runtime:start-runtime nil)))
-      (check (string= (star.edge.android:handle-request "status" nil nil)
-                      "{\"status\":\"ok\",\"state\":\"running\"}"))
-      (check (string= (star.edge.android:handle-request "stop" nil nil)
-                      "{\"status\":\"ok\",\"state\":\"stopped\"}"))
-      ;; closed operation set: eval text is never a runtime operation
-      (check (string= (star.edge.android:handle-request "eval" "(quit)" nil)
-                      "{\"status\":\"error\",\"reason\":\"unknown-operation\"}")))
+    (check (string= (star.edge.android:handle-request "start" nil nil)
+                    "{\"status\":\"ok\",\"state\":\"running\"}"))
+    ;; closed operation set: eval text is never a runtime operation
+    (check (string= (star.edge.android:handle-request "eval" "(quit)" nil)
+                    "{\"status\":\"error\",\"reason\":\"unknown-operation\"}"))
     ;; dispatch without an advertised capability is denied, not forwarded
     (check (string= (star.edge.android:handle-request "dispatch" nil "power.status")
                     "{\"status\":\"denied\",\"reason\":\"capability-not-authorized\"}"))
@@ -310,5 +323,7 @@
       (let ((resp (star.edge.host:call-host host "dispatch" nil "power.status")))
         (check (eq (getf resp :status) :ok))
         (check (equal (getf resp :power) '(:source :battery :percent 42)))))
+
+    (star.edge.android:shutdown-adapter-host)
 
     (format t "~D Common Lisp host contract and runtime checks passed.~%" checks)))

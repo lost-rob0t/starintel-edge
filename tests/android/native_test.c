@@ -134,10 +134,10 @@ int main(int argc, char **argv)
     starintel_ecl_free(response);
 
     response = request_expect("{\"op\":\"status\"}",
-                              "\"status\":\"unavailable\"",
+                              "\"status\":\"ok\"",
                               "status reflects real runtime state");
-    check(json_has(response, "\"reason\":\"runtime-not-attached\""),
-          "status reason is runtime-not-attached");
+    check(json_has(response, "\"state\":\"running\""),
+          "managed runtime starts with the adapter");
     starintel_ecl_free(response);
 
     response = request_expect("{\"op\":\"runtime.ping\"}",
@@ -158,6 +158,18 @@ int main(int argc, char **argv)
           "actor round-trip returns its local message");
     starintel_ecl_free(response);
 
+    response = request_expect("{\"op\":\"actor.list\"}",
+                              "\"id\":\"runtime.echo\"",
+                              "trusted actor catalog is available");
+    starintel_ecl_free(response);
+
+    response = request_expect(
+        "{\"op\":\"actor.dispatch\",\"payload\":\"{\\\"actor_id\\\":\\\"runtime.echo\\\",\\\"message\\\":{}}\"}",
+        "\"ok\":true", "closed actor dispatch succeeds");
+    check(json_has(response, "Edge actor runtime"),
+          "actor dispatch returns the trusted runtime result");
+    starintel_ecl_free(response);
+
     response = request_expect("{\"op\":\"eval\",\"payload\":\"(quit)\"}",
                               "unknown-operation", "eval is not an operation");
     starintel_ecl_free(response);
@@ -172,7 +184,7 @@ int main(int argc, char **argv)
 
     response = request_expect(
         "{\"op\":\"status\",\"payload\":\"{\\\"x\\\":\\\"\\u00e9\\\"}\"}",
-        "\"status\":\"unavailable\"",
+        "\"status\":\"ok\"",
         "escaped payload parsed, payload never evaluated");
     starintel_ecl_free(response);
 

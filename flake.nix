@@ -192,6 +192,9 @@
           actorVendorSources = [
             { name = "alexandria"; src = alexandriaSrc; }
             { name = "bordeaux-threads"; src = bordeauxThreadsSrc; }
+            (quicklispSource "jsown"
+              "https://beta.quicklisp.org/archive/jsown/2020-02-18/jsown-20200218-git.tgz"
+              "sha256-h7/IEdkwJOJelMbErUWYnH+rs77m/GB0GXilFlzdTT0=")
             { name = "global-vars"; src = globalVarsSrc; }
             { name = "trivial-features"; src = trivialFeaturesSrc; }
             { name = "trivial-garbage"; src = trivialGarbageSrc; }
@@ -262,6 +265,10 @@
             substituteInPlace "$out/local-time/src/local-time.lisp" \
               --replace-fail \
               '(eval-when (:compile-toplevel :load-toplevel)' \
+              '(eval-when (:compile-toplevel :load-toplevel :execute)'
+            substituteInPlace "$out/jsown/reader.lisp" \
+              --replace-fail \
+              '(eval-when (:compile-toplevel)' \
               '(eval-when (:compile-toplevel :load-toplevel :execute)'
             for source in \
               "$out/global-vars/global-vars.lisp" \

@@ -8,6 +8,10 @@
 (in-package #:star.edge.actors)
 
 (defvar *actor-system* nil "The edge actor system.")
+(defvar *actor-index-agent* nil
+  "Agent holding a hash-table of registered actor names to actors.")
+(defvar *publisher-agent* nil
+  "Sento agent pinning the publish sink to one thread.")
 
 (defvar *actors-start-hook* nil
   "Functions to run after the actor system and index are started.
@@ -31,6 +35,7 @@ Replaces the server's nhooks-backed hook with a plain list.")
            :eventstream (:dispatcher-id :shared)
            :scheduler (:enabled :true :resolution 100 :max-size 500))))
   (start-actor-index *actor-system*)
+  (run-actors-start-hook)
   *actor-system*)
 
 (defun current-actor-system ()
@@ -56,9 +61,6 @@ Replaces the server's nhooks-backed hook with a plain list.")
 
 ;;;; Actor index: actors must register here before receiving targets.
 ;;;; Adapted from starintel-server source/actors.lisp target routing.
-
-(defvar *actor-index-agent* nil
-  "Agent holding a hash-table of registered actor names to actors.")
 
 (defun start-actor-index (system)
   (declare (ignore system))
@@ -105,9 +107,6 @@ Replaces the server's nhooks-backed hook with a plain list.")
 
 ;;;; Publisher: bounded fail-fast publish through a pinned agent.
 ;;;; The sink port is injected; RabbitMQ remains a server-only transport.
-
-(defvar *publisher-agent* nil
-  "Sento agent pinning the publish sink to one thread.")
 
 (defparameter *publish-timeout-seconds* 5
   "Maximum time for a publish before failing fast instead of blocking callers.")
