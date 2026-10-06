@@ -53,6 +53,10 @@ initial capability families are:
 - actor service start/stop/status; and
 - the canonical Hackmode capability API.
 
+The full [Common Lisp system API guide](COMMON-LISP-SYSTEM-API.md) documents the
+loadable ASDF systems, exact provider signatures, response envelopes, access
+classes, executable catalog, actor-service lifecycle, and runnable examples.
+
 Installed Lisp actor packages register named services with
 `star.edge.actors:register-actor-service`, or use
 `register-sento-actor-service` for a single root actor. Start, stop, and status
