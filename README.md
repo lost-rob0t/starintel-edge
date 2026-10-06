@@ -18,6 +18,10 @@ and the canonical Hackmode adapter. Plans target Debian, NixOS, and Termux;
 missing platform providers remain unavailable. Lish is the configured default
 shell, pending an immutable source/package pin for image bundling.
 
+See the [Common Lisp system API guide](docs/COMMON-LISP-SYSTEM-API.md) for the
+call contract, provider signatures, authorization model, actor-service lifecycle,
+tool catalog, platform status, and complete examples.
+
 Actor packages can register named Sento services and expose authorized
 start/stop/status operations through `star.edge.system`; Edge reuses its one
 process-owned actor system rather than creating a distribution-only supervisor.
@@ -49,6 +53,7 @@ See [ADR 0001](docs/ADR-0001-canonical-upstream.md) and the
 | `tests/` | Common host and platform-facade conformance checks |
 | `downstream/` | Pinning, source migration, release and consumer rules |
 | `distro/` | Headless installer, actor package format, embedded ingest, and NixOS module |
+| `docs/COMMON-LISP-SYSTEM-API.md` | Attax-OS capability API, provider, actor-service, and tooling guide |
 
 ## Target families
 

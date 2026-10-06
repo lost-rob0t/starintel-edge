@@ -6,6 +6,8 @@ system_api_platform(termux).
 
 system_api_invariant(default_deny,
                      'Every installed capability rechecks an injected authorizer immediately before its effect; no authorizer means denied').
+system_api_invariant(literal_authorization,
+                     'The authorizer must return the literal Common Lisp value T; other truthy values are denied, while an authorizer error propagates to its caller').
 system_api_invariant(exact_argv,
                      'Catalog tools receive a bounded list of argument strings through UIOP run-program; shell command strings are not accepted').
 system_api_invariant(capability_honesty,
@@ -35,3 +37,6 @@ schema_lock_invariant(resolver_compatible,
                       'The Edge sync workflow emits expansion_path and points manifest_path at schema-lock-manifest.json while portable_manifest_path names the generated binding manifest').
 schema_lock_invariant(no_authority_regression,
                       'Attax integration preserves the newer exact StarLang commit and complete vendored release closure already pinned on main').
+
+system_api_documentation('docs/COMMON-LISP-SYSTEM-API.md',
+                         'Source-derived operator and provider guide for capability names, signatures, responses, actor services, tools, platforms, and acceptance boundaries').
