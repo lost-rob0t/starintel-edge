@@ -1,0 +1,10 @@
+# Source-only experimental runner. Use an existing, trusted host/NDK toolchain
+# and the SAME ABI adapter bundle; this target does not fetch, install or package.
+ADAPTER_DIR ?= .
+OUT ?= libstarintel_ecl_runner.so
+CFLAGS ?= -O2
+.PHONY: owned-runner
+owned-runner:
+	$(CC) $(CFLAGS) -std=c11 -Wall -Wextra -Werror -fPIE -pie -pthread \
+	  -Iplatforms/android/native platforms/android/native/starintel_ecl_runner.c \
+	  -L$(ADAPTER_DIR) -Wl,-rpath-link,$(ADAPTER_DIR) -lstarintel_ecl_adapter -Wl,-z,defs -o $(OUT)

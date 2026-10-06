@@ -28,6 +28,8 @@ jobs:
         run: sbcl --script tests/runtime.lisp
       - name: Private mesh core semantics (synthetic transport only)
         run: sbcl --script tests/mesh.lisp
+      - name: Experimental owned-process transport (host C ABI stub, not ECL or ART)
+        run: python3 tests/android/test_owned_process.py --build-dir build/owned-host
       - name: Compile and test JVM facades (not Android or device coverage)
         run: |
           mkdir -p build
