@@ -21,9 +21,9 @@ This repository participates in the StarIntel hourly worker fleet.
 - **Canonical StarIntel document authority is 0.10.1 generated from Star Language.** The source of truth is `lost-rob0t/star-lang/specs/starintel/0.10.1/core.star` and its generated artifacts. Consumer repositories must consume/pin generated output; they must not maintain a competing handwritten schema or revive 0.9.x as canonical authority.
 - **Respect worker ownership.** SL01-SL05 own Star Language/compiler/schema domains; PA06-PA09 own Pro Actors/collection runtimes; SS10-SS13 own server/runtime/router/persistence/security; IR14-IR15 own cross-repo integration and release admission. Do not duplicate an in-flight branch or silently take over another worker's owned slice.
 - **One writer per branch.** Re-fetch exact head/base immediately before mutation. Reuse an existing retained branch/PR when it owns the task. Never force-push or overwrite concurrent work.
-- **Evidence is exact-head.** Focused regressions should be RED before implementation and GREEN after it when executable locally. Required CI/checks must be observed on the exact candidate SHA; pending, skipped, stale, foreign, mock-only, or unrun evidence is not green.
-- **No status-only escape hatch.** If the preferred task is blocked, record the precise blocker and advance another executable issue within the repository/worker scope.
+- **Evidence is exact-head.** Required CI/checks must be observed on the exact candidate SHA; pending, skipped, stale, foreign, mock-only, or unrun evidence is not green.
+- **No status-only escape hatch.** If the preferred task is blocked, record the precise blocker and advance another executable issue within scope.
 - **Scheduled fleet tasks stay enabled.** Repository work must not disable a scheduled worker unless the operator explicitly asks for that task to be disabled.
 
-Repository-specific rules in this file still apply; when they are stricter, follow them unless they conflict with the canonical StarIntel 0.10.1 authority above or an explicit current operator instruction.
+Repository-specific rules still apply; stricter local rules win unless they conflict with canonical StarIntel 0.10.1 authority or an explicit current operator instruction.
 <!-- END STARINTEL FLEET CONTRACT -->
