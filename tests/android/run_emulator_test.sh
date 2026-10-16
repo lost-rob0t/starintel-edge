@@ -133,7 +133,22 @@ for phase in first restart; do
     ready=0
     for _ in $(seq 1 120); do
         adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/$phase.log"
-        if grep -q "FAIL $phase" "$evidence/$phase.log"; then cat "$evidence/$phase.log"; exit 1; fi
+        if grep -q "FAIL $phase" "$evidence/$phase.log"; then
+            cat "$evidence/$phase.log"
+            # Keep the acceptance failure. A fresh ART process measures the same
+            # packaged child with a separate 120-second investigative budget.
+            adb -s "$serial" shell am force-stop "$package"
+            adb -s "$serial" logcat -c
+            adb -s "$serial" shell am start -W -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
+                --es phase measure > "$evidence/launch-measure.txt"
+            for _ in $(seq 1 150); do
+                adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/measure.log"
+                if grep -Eq 'MEASURE_DONE|FAIL measure' "$evidence/measure.log"; then break; fi
+                sleep 1
+            done
+            cat "$evidence/measure.log"
+            exit 1
+        fi
         if grep -q "HOLD $phase" "$evidence/$phase.log"; then ready=1; break; fi
         sleep 1
     done

@@ -11,12 +11,14 @@ class DiagnosticLifecycle(unittest.TestCase):
     def test_recreation_runs_one_phase_and_preserves_fresh_data_assertion(self):
         sources = {
             'android/os/Process.java': 'package android.os; public class Process { public static int myPid() { return 1; } }',
+            'android/content/pm/ApplicationInfo.java': 'package android.content.pm; public class ApplicationInfo { public String nativeLibraryDir; }',
             'android/os/Bundle.java': 'package android.os; public class Bundle {}',
             'android/content/Intent.java': 'package android.content; public class Intent { public String getStringExtra(String key) { return System.getProperty("phase", "first"); } }',
             'android/app/Activity.java': '''package android.app;
                 public class Activity {
                     public void onCreate(android.os.Bundle state) {}
                     public void setContentView(Object view) {}
+                    public android.content.pm.ApplicationInfo getApplicationInfo() { return new android.content.pm.ApplicationInfo(); }
                     public android.content.Intent getIntent() { return new android.content.Intent(); }
                     public java.io.File getNoBackupFilesDir() { return new java.io.File(System.getProperty("fixture")); }
                     public void runOnUiThread(Runnable run) { run.run(); }
@@ -71,7 +73,7 @@ class DiagnosticLifecycle(unittest.TestCase):
                 paths.append(str(path))
             src = ROOT / 'platforms/android/edge-service/src/main/java/actor/starintel/edge/service'
             subprocess.run(['java', 'com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-d', str(root), *paths,
-                            str(src / 'LocalRuntimeBackend.java'),
+                            str(src / 'LocalRuntimeBackend.java'), str(src / 'OwnedEclProcess.java'),
                             str(ROOT / 'tests/android/diagnostic/RuntimeDiagnosticActivity.java')], check=True, timeout=30)
             for case in ('recreate', 'stale'):
                 fixture = root / case

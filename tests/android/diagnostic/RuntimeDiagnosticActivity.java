@@ -38,6 +38,26 @@ public final class RuntimeDiagnosticActivity extends Activity {
                 File root = new File(getNoBackupFilesDir(), "runtime");
                 File init = new File(root, "init.lisp");
                 File sentinel = new File(root, "fixture-state.txt");
+                if ("measure".equals(phase)) {
+                    // Separate bounded investigation after acceptance failed. Never
+                    // emits READY/HOLD or changes the production startup deadline.
+                    verify(init, sentinel);
+                    long began = System.nanoTime();
+                    OwnedEclProcess child = OwnedEclProcess.start(
+                            new File(getApplicationInfo().nativeLibraryDir), root, 120000);
+                    try {
+                        Log.i(TAG, "MEASURE handshake-ms=" + (System.nanoTime() - began) / 1000000);
+                        for (String operation : new String[]{"runtime.ping", "service.status", "actor.roundtrip", "service.stop"}) {
+                            String reply = child.request("{\"op\":\"" + operation + "\"}", 5000);
+                            Log.i(TAG, "MEASURE " + operation + " " + reply);
+                        }
+                    } finally {
+                        child.close(5000);
+                    }
+                    verify(init, sentinel);
+                    Log.i(TAG, "MEASURE_DONE synthetic probe only; production acceptance still failed");
+                    return;
+                }
                 if ("first".equals(phase)) {
                     if (root.exists()) throw new IllegalStateException("Fresh APK data required");
                     if (!root.mkdirs()) throw new IllegalStateException("Private directory unavailable");
