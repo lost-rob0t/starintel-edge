@@ -155,18 +155,26 @@ for phase in first restart; do
     test "$ready" -eq 1
     test "$(grep -c "BEGIN $phase" "$evidence/$phase.log")" -eq 1
     test "$(grep -c "STOPPED $phase" "$evidence/$phase.log")" -eq 2
+    cat "$evidence/$phase.log"
     adb -s "$serial" shell ps -A -o PID,PPID,ARGS > "$evidence/processes-$phase.txt"
-    # Exact disposable APK PID only. Killing ART alone tests creator-parent
-    # death separately from Android force-stop, which may kill the whole UID.
+    cat "$evidence/processes-$phase.txt"
+    # Ask the disposable app to kill only its verified current ART PID. run-as
+    # signal probes are denied across Android SELinux domains on API 36. Keep
+    # policy intact; observe both PIDs via ps, never mistake EPERM for exit.
     parent=$(adb -s "$serial" shell pidof "$package" | tr -d '\r')
     [[ "$parent" =~ ^[0-9]+$ ]]
     child=$(awk -v p="$parent" '$2 == p && /libstarintel_ecl_runner.so/ {print $1}' "$evidence/processes-$phase.txt")
     [[ "$child" =~ ^[0-9]+$ ]]
-    adb -s "$serial" shell run-as "$package" kill -0 "$child"
-    adb -s "$serial" shell run-as "$package" kill -9 "$parent"
+    timeout 15 adb -s "$serial" shell am start -W -f 0x20000000 \
+        -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
+        --es phase die --ei expected-pid "$parent" > "$evidence/death-$phase.txt" 2>&1 || true
     retired=0
     for _ in $(seq 1 30); do
-        if ! adb -s "$serial" shell run-as "$package" kill -0 "$child" 2>/dev/null; then retired=1; break; fi
+        if timeout 5 adb -s "$serial" shell ps -A -o PID,PPID,ARGS > "$evidence/retired-$phase.txt"; then
+            if grep -Eq '^ *PID +PPID' "$evidence/retired-$phase.txt" && awk -v parent="$parent" -v child="$child" \
+                'NR > 1 && ($1 == parent || $1 == child) {found=1} END {exit found ? 1 : 0}' \
+                "$evidence/retired-$phase.txt"; then retired=1; break; fi
+        fi
         sleep 1
     done
     test "$retired" -eq 1

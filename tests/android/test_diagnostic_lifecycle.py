@@ -10,13 +10,14 @@ ROOT = Path(__file__).resolve().parents[2]
 class DiagnosticLifecycle(unittest.TestCase):
     def test_recreation_runs_one_phase_and_preserves_fresh_data_assertion(self):
         sources = {
-            'android/os/Process.java': 'package android.os; public class Process { public static int myPid() { return 1; } }',
+            'android/os/Process.java': 'package android.os; public class Process { public static int killed = -1; public static int myPid() { return 1; } public static void killProcess(int pid) { killed = pid; } }',
             'android/content/pm/ApplicationInfo.java': 'package android.content.pm; public class ApplicationInfo { public String nativeLibraryDir; }',
             'android/os/Bundle.java': 'package android.os; public class Bundle {}',
-            'android/content/Intent.java': 'package android.content; public class Intent { public String getStringExtra(String key) { return System.getProperty("phase", "first"); } }',
+            'android/content/Intent.java': 'package android.content; public class Intent { public String getStringExtra(String key) { return System.getProperty("phase", "first"); } public int getIntExtra(String key, int fallback) { return Integer.getInteger(key, fallback); } }',
             'android/app/Activity.java': '''package android.app;
                 public class Activity {
                     public void onCreate(android.os.Bundle state) {}
+                    protected void onNewIntent(android.content.Intent intent) {}
                     public void setContentView(Object view) {}
                     public android.content.pm.ApplicationInfo getApplicationInfo() { return new android.content.pm.ApplicationInfo(); }
                     public android.content.Intent getIntent() { return new android.content.Intent(); }
@@ -42,6 +43,15 @@ class DiagnosticLifecycle(unittest.TestCase):
             'actor/starintel/edge/service/DiagnosticTest.java': '''package actor.starintel.edge.service;
                 public class DiagnosticTest {
                     public static void main(String[] args) throws Exception {
+                        if (args.length > 0 && args[0].startsWith("die")) {
+                            System.setProperty("phase", "die");
+                            System.setProperty("expected-pid", args[0].equals("die") ? "1" : "2");
+                            RuntimeDiagnosticActivity activity = new RuntimeDiagnosticActivity();
+                            activity.onCreate(null);
+                            activity.onNewIntent(new android.content.Intent());
+                            if (android.os.Process.killed != (args[0].equals("die") ? 1 : -1) || AndroidEclBackend.opens != 0) throw new AssertionError("Death target ownership failed");
+                            return;
+                        }
                         boolean stale = args.length > 0;
                         if (stale) new java.io.File(System.getProperty("fixture"), "runtime").mkdirs();
                         new RuntimeDiagnosticActivity().onCreate(null);
@@ -77,9 +87,9 @@ class DiagnosticLifecycle(unittest.TestCase):
             subprocess.run(['java', 'com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-d', str(root), *paths,
                             str(src / 'LocalRuntimeBackend.java'), str(src / 'OwnedEclProcess.java'),
                             str(ROOT / 'tests/android/diagnostic/RuntimeDiagnosticActivity.java')], check=True, timeout=30)
-            for case in ('recreate', 'stale'):
+            for case in ('recreate', 'stale', 'die', 'die-mismatch'):
                 fixture = root / case
                 fixture.mkdir()
                 subprocess.run(['java', '-cp', str(root), '-Dfixture=' + str(fixture),
-                                'actor.starintel.edge.service.DiagnosticTest', *(['stale'] if case == 'stale' else [])], check=True, timeout=5)
+                                'actor.starintel.edge.service.DiagnosticTest', *([case] if case != 'recreate' else [])], check=True, timeout=5)
 

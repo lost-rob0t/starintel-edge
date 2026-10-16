@@ -24,6 +24,7 @@ public final class RuntimeDiagnosticActivity extends Activity {
     private static LocalRuntimeBackend.Session held;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        if (requestOwnerDeath(getIntent())) return;
         TextView status = new TextView(this);
         status.setText("Running owned ECL acceptance…");
         setContentView(status);
@@ -87,6 +88,21 @@ public final class RuntimeDiagnosticActivity extends Activity {
                 runOnUiThread(() -> status.setText("FAIL: " + failure.getClass().getSimpleName()));
             }
         }, "owned-ecl-acceptance").start();
+    }
+    @Override protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        requestOwnerDeath(intent);
+    }
+    private static boolean requestOwnerDeath(android.content.Intent intent) {
+        if (!"die".equals(intent.getStringExtra("phase"))) return false;
+        int expected = intent.getIntExtra("expected-pid", -1);
+        if (expected != android.os.Process.myPid()) {
+            Log.e(TAG, "FAIL die", new IllegalStateException("Unexpected diagnostic owner"));
+            return true;
+        }
+        Log.i(TAG, "SELF_DEATH owner=" + expected);
+        android.os.Process.killProcess(expected); // This diagnostic process only.
+        return true;
     }
     private static void verify(File init, File sentinel) throws Exception {
         if (!java.util.Arrays.equals(Files.readAllBytes(init.toPath()), INIT.getBytes(StandardCharsets.UTF_8))
