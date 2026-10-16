@@ -18,13 +18,21 @@ public final class RuntimeDiagnosticActivity extends Activity {
             + "(with-open-file (s (merge-pathnames \"fixture-state.txt\" *default-pathname-defaults*))\n"
             + "  (unless (string= (read-line s) \"synthetic-preserved-state\") (error \"fixture-state-lost\")))\n";
     private static final byte[] STATE = "synthetic-preserved-state\n".getBytes(StandardCharsets.UTF_8);
-    private LocalRuntimeBackend.Session held;
+    // Activity recreation must not launch a second worker against the same data.
+    // The harness kills this ART process between phases, resetting this owner.
+    private static final java.util.concurrent.atomic.AtomicBoolean launched = new java.util.concurrent.atomic.AtomicBoolean();
+    private static LocalRuntimeBackend.Session held;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         TextView status = new TextView(this);
         status.setText("Running owned ECL acceptance…");
         setContentView(status);
         String phase = getIntent().getStringExtra("phase");
+        if (!launched.compareAndSet(false, true)) {
+            Log.i(TAG, "RECREATED " + phase + " existing process-owned diagnostic");
+            return;
+        }
+        Log.i(TAG, "BEGIN " + phase + " pid=" + android.os.Process.myPid());
         new Thread(() -> {
             try {
                 File root = new File(getNoBackupFilesDir(), "runtime");

@@ -123,6 +123,9 @@ if adb -s "$serial" shell dumpsys package "$package" | grep -q android.permissio
     echo 'Diagnostic APK unexpectedly requests Internet permission' >&2
     exit 1
 fi
+# Freshness is checked before any Activity can create the fixture. Never clear
+# data between phases: restart must read the same synthetic state.
+adb -s "$serial" shell run-as "$package" test ! -e no_backup/runtime
 for phase in first restart; do
     adb -s "$serial" logcat -c
     adb -s "$serial" shell am start -W -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
@@ -135,6 +138,7 @@ for phase in first restart; do
         sleep 1
     done
     test "$ready" -eq 1
+    test "$(grep -c "BEGIN $phase" "$evidence/$phase.log")" -eq 1
     test "$(grep -c "STOPPED $phase" "$evidence/$phase.log")" -eq 2
     adb -s "$serial" shell ps -A -o PID,PPID,ARGS > "$evidence/processes-$phase.txt"
     # Exact disposable APK PID only. Killing ART alone tests creator-parent
