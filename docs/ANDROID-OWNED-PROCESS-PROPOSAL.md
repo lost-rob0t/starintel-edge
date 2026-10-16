@@ -1,5 +1,8 @@
 # Android owned process transport source proposal
 
+Historical transport-only scope. The subsequent service integration and current
+evidence are tracked in [owned runtime acceptance](ANDROID-OWNED-RUNTIME-ACCEPTANCE.md).
+
 This additive experiment targets published StarIntel Edge commit
 `4c3d10b31ca34830ef303c23da3679f334ff0fa5`. It supplies a standalone C runner and
 Java pipe client. It does not select an Android backend, change service

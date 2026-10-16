@@ -5,8 +5,21 @@ set -euo pipefail
 
 if [ "${STARINTEL_ANDROID_TEST_IN_SHELL:-}" != 1 ]; then
     exec env -u 'BASH_FUNC_git-sync%%' STARINTEL_ANDROID_TEST_IN_SHELL=1 \
-        nix develop -c bash "$0" "$@"
+        nix develop --no-update-lock-file .#android-runtime -c bash "$0" "$@"
 fi
+
+# CI images may export ANDROID_HOME for a different SDK. Use only the flake SDK.
+: "${ANDROID_SDK_ROOT:?android-runtime shell must provide its SDK}"
+export ANDROID_HOME="$ANDROID_SDK_ROOT"
+export PATH="$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator:$PATH"
+system_image="$ANDROID_SDK_ROOT/system-images/android-36/google_apis/x86_64"
+for required in system.img vendor.img ramdisk.img kernel-ranchu; do
+    if [ ! -s "$system_image/$required" ]; then
+        printf 'Missing emulator image file: %s/%s\n' "$system_image" "$required" >&2
+        exit 1
+    fi
+done
+printf 'Android SDK: %s\nSystem image: %s\n' "$ANDROID_HOME" "$system_image"
 
 port=${STARINTEL_ANDROID_EMULATOR_PORT:-5584}
 serial="emulator-$port"
@@ -14,10 +27,26 @@ test_root=$(mktemp -d /tmp/starintel-edge-emulator-test.XXXXXX)
 avd_home="$test_root/avd"
 android_user_home="$test_root/user"
 emulator_pid=
+evidence="$PWD/build/owned-art-evidence"
+mkdir -p "$evidence"
+git rev-parse HEAD > "$evidence/source-revision.txt"
 
 cleanup() {
     if [ -n "$emulator_pid" ]; then
-        adb -s "$serial" emu kill >/dev/null 2>&1 || true
+        timeout 10 adb -s "$serial" logcat -d > "$evidence/logcat-final.txt" 2>&1 || true
+        # Synthetic diagnostic APK only: expose native startup/crash diagnostics
+        # in CI too, since archive downloads may be unavailable to reviewers.
+        timeout 10 adb -s "$serial" logcat -d -s StarIntelEdgeRuntime:V libc:F DEBUG:F \
+            '*:S' > "$evidence/native-errors.txt" 2>&1 || true
+        cat "$evidence/native-errors.txt"
+        cp "$test_root/emulator.log" "$evidence/emulator.log" || true
+        tail -n 100 "$test_root/emulator.log" || true
+        timeout 10 adb -s "$serial" emu kill >/dev/null 2>&1 || true
+        # Only the emulator still tracked as our own active shell job. ADB may
+        # never connect during a failed boot, so it cannot be the sole cleanup path.
+        if jobs -pr | grep -qx "$emulator_pid"; then
+            kill -KILL "$emulator_pid" 2>/dev/null || true
+        fi
         wait "$emulator_pid" 2>/dev/null || true
     fi
     case "$test_root" in
@@ -42,7 +71,7 @@ avdmanager create avd --force \
     --package 'system-images;android-36;google_apis;x86_64' \
     --device pixel_4 <<< no
 
-apk_output=$(nix build .#android-runtime-diagnostic-apk \
+apk_output=$(nix build --no-update-lock-file .#android-runtime-diagnostic-apk \
     --no-link --print-out-paths)
 unsigned_apk="$apk_output/starintel-edge-runtime-diagnostic-unsigned.apk"
 signed_apk="$test_root/starintel-edge-runtime-diagnostic.apk"
@@ -56,15 +85,27 @@ keytool -genkeypair -keystore "$keystore" -storepass android \
     --ks "$keystore" --ks-pass pass:android --key-pass pass:android \
     --out "$signed_apk" "$unsigned_apk"
 
+bundle_output=$(nix build --no-update-lock-file .#android-runtime-x86_64 --no-link --print-out-paths)
+python3 tests/android/verify_owned_apk.py "$signed_apk" "$bundle_output" > "$evidence/packaged-bytes.json"
+
+cp "$signed_apk" "$evidence/owned-runtime-diagnostic.apk"
+sha256sum "$evidence/owned-runtime-diagnostic.apk" > "$evidence/apk.sha256"
+cat "$avd_home/starintel_edge_runtime.avd/config.ini" > "$evidence/avd-config.ini"
+printf 'ANDROID_HOME=%s\nANDROID_SDK_ROOT=%s\n' "$ANDROID_HOME" "$ANDROID_SDK_ROOT" > "$evidence/sdk.txt"
+
 emulator -avd starintel_edge_runtime -port "$port" \
     -no-window -no-snapshot -wipe-data -no-audio -no-boot-anim \
     -gpu swiftshader_indirect >"$test_root/emulator.log" 2>&1 &
 emulator_pid=$!
 
-adb -s "$serial" wait-for-device
 booted=0
-for _ in $(seq 1 120); do
-    if [ "$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; then
+boot_deadline=$((SECONDS + 300))
+while [ "$SECONDS" -lt "$boot_deadline" ]; do
+    if ! jobs -pr | grep -qx "$emulator_pid"; then
+        echo 'Owned emulator exited before boot completed' >&2
+        exit 1
+    fi
+    if [ "$(timeout 5 adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)" = 1 ]; then
         booted=1
         break
     fi
@@ -76,35 +117,68 @@ test "$(adb -s "$serial" shell getprop ro.product.cpu.abi | tr -d '\r')" = x86_6
 adb -s "$serial" install -r "$signed_apk"
 adb -s "$serial" shell svc wifi disable
 adb -s "$serial" shell svc data disable
-adb -s "$serial" logcat -c
-adb -s "$serial" shell am start -W \
-    -n actor.starintel.edge.diagnostic/.RuntimeDiagnosticActivity >/dev/null
-
-passed=0
-for _ in $(seq 1 90); do
-    if adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I '*:S' |
-            grep -q ' PASS '; then
-        passed=1
-        break
-    fi
-    sleep 1
+package=actor.starintel.edge.diagnostic
+adb -s "$serial" shell getprop > "$evidence/emulator-properties.txt"
+if adb -s "$serial" shell dumpsys package "$package" | grep -q android.permission.INTERNET; then
+    echo 'Diagnostic APK unexpectedly requests Internet permission' >&2
+    exit 1
+fi
+# Freshness is checked before any Activity can create the fixture. Never clear
+# data between phases: restart must read the same synthetic state.
+adb -s "$serial" shell run-as "$package" test ! -e no_backup/runtime
+for phase in first restart; do
+    adb -s "$serial" logcat -c
+    adb -s "$serial" shell am start -W -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
+        --es phase "$phase" > "$evidence/launch-$phase.txt"
+    ready=0
+    for _ in $(seq 1 300); do
+        adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/$phase.log"
+        if grep -q "FAIL $phase" "$evidence/$phase.log"; then
+            cat "$evidence/$phase.log"
+            # Keep the acceptance failure. A fresh ART process measures the same
+            # packaged child with a separate 120-second investigative budget.
+            adb -s "$serial" shell am force-stop "$package"
+            adb -s "$serial" logcat -c
+            adb -s "$serial" shell am start -W -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
+                --es phase measure > "$evidence/launch-measure.txt"
+            for _ in $(seq 1 150); do
+                adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/measure.log"
+                if grep -Eq 'MEASURE_DONE|FAIL measure' "$evidence/measure.log"; then break; fi
+                sleep 1
+            done
+            cat "$evidence/measure.log"
+            exit 1
+        fi
+        if grep -q "HOLD $phase" "$evidence/$phase.log"; then ready=1; break; fi
+        sleep 1
+    done
+    test "$ready" -eq 1
+    test "$(grep -c "BEGIN $phase" "$evidence/$phase.log")" -eq 1
+    test "$(grep -c "STOPPED $phase" "$evidence/$phase.log")" -eq 2
+    cat "$evidence/$phase.log"
+    adb -s "$serial" shell ps -A -o PID,PPID,ARGS > "$evidence/processes-$phase.txt"
+    cat "$evidence/processes-$phase.txt"
+    # Ask the disposable app to kill only its verified current ART PID. run-as
+    # signal probes are denied across Android SELinux domains on API 36. Keep
+    # policy intact; observe both PIDs via ps, never mistake EPERM for exit.
+    parent=$(adb -s "$serial" shell pidof "$package" | tr -d '\r')
+    [[ "$parent" =~ ^[0-9]+$ ]]
+    child=$(awk -v p="$parent" '$2 == p && /libstarintel_ecl_runner.so/ {print $1}' "$evidence/processes-$phase.txt")
+    [[ "$child" =~ ^[0-9]+$ ]]
+    timeout 15 adb -s "$serial" shell am start -W -f 0x20000000 \
+        -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
+        --es phase die --ei expected-pid "$parent" > "$evidence/death-$phase.txt" 2>&1 || true
+    retired=0
+    for _ in $(seq 1 30); do
+        if timeout 5 adb -s "$serial" shell ps -A -o PID,PPID,ARGS > "$evidence/retired-$phase.txt"; then
+            if grep -Eq '^ *PID +PPID' "$evidence/retired-$phase.txt" && awk -v parent="$parent" -v child="$child" \
+                'NR > 1 && ($1 == parent || $1 == child) {found=1} END {exit found ? 1 : 0}' \
+                "$evidence/retired-$phase.txt"; then retired=1; break; fi
+        fi
+        sleep 1
+    done
+    test "$retired" -eq 1
+    printf 'ART pid=%s killed; owned child pid=%s exited; phase=%s\n' "$parent" "$child" "$phase" >> "$evidence/retirement.txt"
+    adb -s "$serial" shell am force-stop "$package"
 done
-test "$passed" -eq 1
-
-diagnostic_log=$(adb -s "$serial" logcat -d \
-    -s StarIntelEdgeRuntime:E StarIntelEdgeDiagnostic:I '*:S')
-if printf '%s' "$diagnostic_log" |
-        grep -Eq 'Runtime diagnostic failed| FAIL '; then
-    printf '%s\n' "$diagnostic_log" >&2
-    exit 1
-fi
-
-if adb -s "$serial" shell dumpsys package actor.starintel.edge.diagnostic |
-        grep -q android.permission.INTERNET; then
-    printf 'Diagnostic APK unexpectedly requests Internet permission\n' >&2
-    exit 1
-fi
-adb -s "$serial" shell uiautomator dump /sdcard/starintel-edge.xml >/dev/null
-adb -s "$serial" shell cat /sdcard/starintel-edge.xml |
-    grep -q 'Local Sento actor round-trip passed'
-printf '%s\n' "$diagnostic_log"
+printf '%s\n' 'PASS x86_64 Android ART launching standalone ECL: real Sento, stop/restart, parent death, offline private fixture preservation. No physical-device or database crash-durability claim.' | tee "$evidence/result.txt"

@@ -5,11 +5,12 @@ import java.io.File;
 /** Lifecycle orchestration over the existing upstream native ABI. No Lisp boot/actor implementation. */
 public final class EclLifecycle implements LocalRuntimeBackend {
     public interface NativePort {
-        int abiVersion();
-        String start(String runtimeDirectory);
-        boolean localServiceReady();
-        boolean stopManagedRuntime();
-        void stop();
+        default boolean isAlive() { return true; }
+        int abiVersion() throws Exception;
+        String start(String runtimeDirectory) throws Exception;
+        boolean localServiceReady() throws Exception;
+        boolean stopManagedRuntime() throws Exception;
+        void stop() throws Exception;
     }
     public interface Assets { void install(File destination, Cancellation cancellation) throws Exception; }
     private final NativePort nativePort;
@@ -37,7 +38,8 @@ public final class EclLifecycle implements LocalRuntimeBackend {
             cancellation.check();
             return new Session() {
                 private boolean stopped;
-                @Override public void close() {
+                @Override public boolean isAlive() { return nativePort.isAlive(); }
+                @Override public void close() throws Exception {
                     if (stopped) return;
                     boolean graceful;
                     try { graceful = nativePort.stopManagedRuntime(); }

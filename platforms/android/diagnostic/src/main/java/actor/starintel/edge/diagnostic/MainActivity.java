@@ -72,7 +72,7 @@ public final class MainActivity extends Activity {
         title.setTextSize(23);
         view.addView(title);
         TextView explanation = new TextView(this);
-        explanation.setText("This service uses the existing ECL/JNI local Lisp actor core when its runtime bundle is packaged. Missing libraries report BACKEND_MISSING. Full star-server HTTP/CouchDB/RabbitMQ is not included.\n\n"
+        explanation.setText("This service uses the existing standalone ECL local Lisp actor core when its runtime bundle is packaged. Missing libraries report BACKEND_MISSING. Full star-server HTTP/CouchDB/RabbitMQ is not included.\n\n"
                 + "A real runtime will keep a visible notification with Stop, preserve private init.lisp, and require a new explicit Start after process death or reboot. Android can still stop it or restrict networking.\n");
         view.addView(explanation);
         status = new TextView(this); view.addView(status);

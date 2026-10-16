@@ -63,6 +63,18 @@ static char *starintel_error_json(const char *reason)
     return out;
 }
 
+/* Fixed stage labels only: no init contents, request data or conditions. These
+ * distinguish native boot from packaged-source loading without changing signals.
+ */
+static void log_boot_stage(const char *stage)
+{
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_INFO, "StarIntelEdgeRuntime", stage);
+#else
+    (void)stage;
+#endif
+}
+
 static void log_startup_error(const char *message)
 {
 #ifdef __ANDROID__
@@ -279,13 +291,17 @@ static int starintel_ecl_start_impl(const char *runtime_directory, char **error,
         char *argv0[1];
         argv0[0] = (char *)"starintel-ecl-adapter";
         starintel_ecl_booted_once = 1;
+        log_boot_stage("native-boot-enter");
         if (cl_boot(1, argv0) == 0)
             failed = 1;
+        log_boot_stage("native-boot-return");
     }
 #ifdef __ANDROID__
     if (!failed) {
+        log_boot_stage("modules-enter");
         (void)ecl_init_module(NULL, init_lib_CMP);
         (void)ecl_init_module(NULL, init_lib_ASDF);
+        log_boot_stage("modules-return");
     }
 #endif
     if (!failed) {
@@ -302,7 +318,9 @@ static int starintel_ecl_start_impl(const char *runtime_directory, char **error,
                  runtime_root);
         path = lisp_string_from_utf8(startup_path, strlen(startup_path));
         free(startup_path);
+        log_boot_stage("assets-enter");
         form = path == OBJNULL ? OBJNULL : load_runtime_assets(path);
+        log_boot_stage("assets-return");
         if (form == OBJNULL) {
             log_startup_error("unhandled ECL condition while loading assets");
             failed = 1;
@@ -329,6 +347,7 @@ static int starintel_ecl_start_impl(const char *runtime_directory, char **error,
             *error = starintel_error("runtime-assets-unavailable");
         return -1;
     }
+    log_boot_stage("runtime-ready");
     starintel_ecl_started = 1;
     pthread_mutex_unlock(&starintel_ecl_lock);
     return 0;

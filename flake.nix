@@ -329,6 +329,11 @@
                   platforms/android/native/starintel_ecl_jni.c \
                   -L. -lstarintel_ecl_adapter \
                   -o libstarintel_ecl_jni.so
+                "$android_cc" -O2 -std=c11 -Wall -Wextra -Werror -fPIE -pie -pthread \
+                  -Wl,-z,defs -Iplatforms/android/native \
+                  platforms/android/native/starintel_ecl_runner.c \
+                  -L. -Wl,-rpath-link,${ecl}/lib -lstarintel_ecl_adapter \
+                  -o libstarintel_ecl_runner.so
                 runHook postBuild
               '';
               installPhase = ''
@@ -347,6 +352,8 @@
                   "$out/jni/${abi}/libstarintel_ecl_adapter.so"
                 install -m755 libstarintel_ecl_jni.so \
                   "$out/jni/${abi}/libstarintel_ecl_jni.so"
+                install -m755 libstarintel_ecl_runner.so \
+                  "$out/jni/${abi}/libstarintel_ecl_runner.so"
                 install -m644 platforms/android/native/starintel_ecl_adapter.h \
                   "$out/include/starintel_ecl_adapter.h"
                 install -m644 \
@@ -388,6 +395,8 @@
                 jni_hash=$(sha256sum \
                   "$out/jni/${abi}/libstarintel_ecl_jni.so")
                 jni_hash=''${jni_hash%% *}
+                runner_hash=$(sha256sum "$out/jni/${abi}/libstarintel_ecl_runner.so")
+                runner_hash=''${runner_hash%% *}
                 jq -n \
                   --arg abi "${abi}" \
                   --arg api "${apiLevel}" \
@@ -396,13 +405,15 @@
                   --arg lmdbSha256 "$lmdb_hash" \
                   --arg adapterSha256 "$adapter_hash" \
                   --arg jniSha256 "$jni_hash" \
+                  --arg runnerSha256 "$runner_hash" \
                   '{abi: $abi, androidMinApi: ($api | tonumber),
                     adapterAbiVersion: 1, eclVersion: $eclVersion,
                     artifacts: {
                       "libecl.so": $eclSha256,
                       "liblmdb.so": $lmdbSha256,
                       "libstarintel_ecl_adapter.so": $adapterSha256,
-                      "libstarintel_ecl_jni.so": $jniSha256
+                      "libstarintel_ecl_jni.so": $jniSha256,
+                      "libstarintel_ecl_runner.so": $runnerSha256
                     }}' > "$out/manifest.json"
                 runHook postInstall
               '';
@@ -424,23 +435,20 @@
             pname = "starintel-edge-runtime-diagnostic";
             version = "0.1.0";
             src = self;
-            nativeBuildInputs = [ pkgs.jdk17 pkgs.kotlin pkgs.zip ];
+            nativeBuildInputs = [ pkgs.jdk17 pkgs.zip ];
             dontConfigure = true;
             buildPhase = ''
               runHook preBuild
               mkdir -p classes dex package/lib/x86_64 package/assets
-              kotlinc \
-                ${runtimeX86_64}/kotlin/actor/starintel/edge/StarIntelEdgeRuntime.kt \
-                tests/android/diagnostic/RuntimeDiagnosticActivity.kt \
-                -classpath ${androidJar} \
-                -jvm-target 1.8 \
-                -d classes
+              javac -encoding UTF-8 --release 17 -classpath ${androidJar} -d classes \
+                platforms/android/edge-service/src/main/java/actor/starintel/edge/service/{LocalRuntimeBackend,EclLifecycle,RuntimeAssets,OwnedEclProcess,OwnedEclNativePort,AndroidEclBackend}.java \
+                tests/android/diagnostic/RuntimeDiagnosticActivity.java
               jar --create --file diagnostic.jar -C classes .
               ${androidBuildTools}/d8 \
                 --min-api ${apiLevel} \
                 --lib ${androidJar} \
                 --output dex \
-                diagnostic.jar ${pkgs.kotlin}/lib/kotlin-stdlib.jar
+                diagnostic.jar
               cp dex/classes.dex package/classes.dex
               cp -R ${runtimeX86_64}/jni/x86_64/. package/lib/x86_64/
               cp -R ${runtimeX86_64}/assets/. package/assets/
@@ -630,6 +638,11 @@
       devShells = forAllSystems (system:
         let p = mkPackages system;
         in {
+          android-runtime = p.pkgs.mkShell {
+            packages = [ p.pkgs.jdk17 p.android.androidsdk ];
+            ANDROID_SDK_ROOT = "${p.android.androidsdk}/libexec/android-sdk";
+            ANDROID_HOME = "${p.android.androidsdk}/libexec/android-sdk";
+          };
           default = p.pkgs.mkShell ({
             packages = [ p.installer p.edgeIngest ]
               ++ nixpkgs.lib.optionals (system == "x86_64-linux") [
@@ -643,6 +656,7 @@
             ];
           } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
             ANDROID_SDK_ROOT = "${p.android.androidsdk}/libexec/android-sdk";
+            ANDROID_HOME = "${p.android.androidsdk}/libexec/android-sdk";
             STARINTEL_ANDROID_NDK = "${p.android.ndk-bundle}/libexec/android-sdk/ndk/28.2.13676358";
           });
         });

@@ -156,6 +156,11 @@ public final class OwnedEclProcess implements Closeable {
         }
     }
 
+    /** Nonblocking observation of this exact child; never searches by PID/name. */
+    public boolean isAlive() {
+        synchronized (ownership) { return !closed && child != null && child.isAlive(); }
+    }
+
     private void admit() {
         if (!admitted.compareAndSet(false, true)) throw new IllegalStateException("Exchange already in progress");
         if (closed) { admitted.set(false); throw new IllegalStateException("Owned child is closed"); }

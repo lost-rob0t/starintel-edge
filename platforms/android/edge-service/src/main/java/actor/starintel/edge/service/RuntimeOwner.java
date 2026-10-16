@@ -43,7 +43,18 @@ final class RuntimeOwner {
                     // No PID is accepted from IPC/config. This cannot kill the UI or another app.
                     Process.killProcess(Process.myPid());
                 };
-                main.postDelayed(timeout, snapshot.state == RuntimeController.State.STARTING ? 30000 : 10000);
+                // Includes asset extraction (12-25s observed), bounded 60s
+                // child startup, and readiness/cleanup margin.
+                main.postDelayed(timeout, snapshot.state == RuntimeController.State.STARTING ? 120000 : 10000);
+            }
+            if (snapshot.state == RuntimeController.State.RUNNING) {
+                main.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        if (snapshot != controller.snapshot()) return;
+                        controller.checkHealth();
+                        if (snapshot == controller.snapshot()) main.postDelayed(this, 1000);
+                    }
+                }, 1000);
             }
             if (listener != null) listener.accept(snapshot);
             if (!snapshot.active() && controller.requiresFreshProcess() && !retiring) {

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  */
 public final class RuntimeController implements AutoCloseable {
     public enum State { STOPPED, STARTING, RUNNING, STOPPING, UNAVAILABLE, FAILED }
-    public enum Reason { NONE, USER_STOP, BACKEND_MISSING, START_FAILED, STOP_FAILED, PROCESS_RESTART_REQUIRED }
+    public enum Reason { NONE, USER_STOP, BACKEND_MISSING, START_FAILED, STOP_FAILED, PROCESS_RESTART_REQUIRED, RUNTIME_EXITED }
     public static final class Snapshot {
         public final State state;
         public final Reason reason;
@@ -98,6 +98,20 @@ public final class RuntimeController implements AutoCloseable {
         }
         // STARTING owns its eventual result and disposes it before reporting STOPPED.
         return true;
+    }
+    /** Called by the Android owner; never queues repeated probes or performs pipe I/O. */
+    public synchronized void checkHealth() {
+        if (closed || snapshot.state != State.RUNNING || session.isAlive()) return;
+        cancellation.cancel();
+        LocalRuntimeBackend.Session owned = session;
+        transition(State.STOPPING, Reason.RUNTIME_EXITED);
+        worker.execute(() -> {
+            boolean clean = dispose(owned);
+            synchronized (RuntimeController.this) {
+                if (clean) session = null;
+                transition(State.FAILED, clean ? Reason.RUNTIME_EXITED : Reason.STOP_FAILED);
+            }
+        });
     }
     private boolean dispose(LocalRuntimeBackend.Session owned) {
         if (owned == null) return true;

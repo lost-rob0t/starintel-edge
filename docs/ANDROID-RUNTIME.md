@@ -1,9 +1,9 @@
 # Android Common Lisp runtime boundary
 
-> Current safety gate (2026-10-04): managed JVM/ART startup is unavailable before
-> ECL boot. Existing published APKs predate this guard and are **not runtime-ready**.
-> No replacement APK has been built or published for this repair. See
-> [embedding safety evidence](EMBEDDING-SAFETY.md).
+> Managed JNI still refuses boot. The service now selects a standalone ECL child;
+> see [owned runtime acceptance](ANDROID-OWNED-RUNTIME-ACCEPTANCE.md) for current
+> build/execution evidence and remaining gates. Prior JNI APKs remain unverified.
+> The [embedding safety evidence](EMBEDDING-SAFETY.md) still applies to JNI.
 
 
 `starintel-edge` owns the reusable Android runtime artifact. Android products
@@ -33,6 +33,7 @@ jni/<abi>/libecl.so
 jni/<abi>/liblmdb.so
 jni/<abi>/libstarintel_ecl_adapter.so
 jni/<abi>/libstarintel_ecl_jni.so
+jni/<abi>/libstarintel_ecl_runner.so
 include/starintel_ecl_adapter.h
 kotlin/actor/starintel/edge/StarIntelEdgeRuntime.kt
 assets/starintel-edge/lisp/
@@ -41,7 +42,7 @@ manifest.json
 
 `android-runtime-diagnostic-apk` is a separate unsigned test artifact. It is
 not a product UI and is not a downstream application dependency. It exists to
-prove that the packaged libraries and trusted Lisp assets boot inside ART.
+prove that the packaged libraries and trusted Lisp assets boot in an ART-owned standalone child.
 
 The bundle statically registers ECL's CMP and ASDF modules with the embedded
 runtime, then source-loads the pinned actor dependency tree. Android therefore
@@ -61,7 +62,8 @@ environment access, or shell access.
 | --- | --- |
 | Standalone native C/ECL | Scoped to controlled host processes and the documented owning thread; arbitrary foreign-thread embedding is not established |
 | Host Java/Kotlin/JNI startup | Fails closed with `jvm-runtime-embedding-unverified` before `cl_boot` |
-| Android ART startup | Fails closed with `android-runtime-embedding-unverified`; separate signal/thread/shutdown acceptance is required |
+| Android managed JNI startup | Fails closed with `android-runtime-embedding-unverified` |
+| ART-owned standalone child | Selected by the service; actual build/emulator proof tracked in the owned runtime acceptance document |
 | Both Android ABI packages / previous diagnostic APK | Historical packaging evidence only; published APKs predate the guard and are not runtime-ready |
 | Actor dispatch and document payload interoperability | Prior functional passes do not establish managed runtime safety; source-hashed evidence must distinguish old and repaired native adapters |
 | Physical ARM64/watch/glasses behavior | Not established by these host tests |

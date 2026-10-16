@@ -1,24 +1,22 @@
 # Android foreground-service host
 
-> Managed runtime safety gate (2026-10-04): JNI startup now returns
-> `android-runtime-embedding-unverified` before ECL boot. Earlier published APKs
-> predate this source guard and are **not runtime-ready**. No new APK was built or
-> published for this repair. See [embedding safety](../../docs/EMBEDDING-SAFETY.md).
+> The managed JNI safety guard remains unchanged. The service now selects a
+> standalone ECL child instead; this branch is pending actual Android acceptance.
+> See [owned runtime evidence](../../docs/ANDROID-OWNED-RUNTIME-ACCEPTANCE.md)
+> and [embedding safety](../../docs/EMBEDDING-SAFETY.md).
 
-
-This source reuses the existing ECL/LMDB/JNI runtime at
-`f801b024965488c21f93c52a1a9fd2aecd224700`. It adds an Android library and diagnostic
-service app, not another Lisp implementation or a remote proxy. **Debug APK/AAR
-builds and host-ECL tests pass; ART service acceptance remains open.** Full star-server HTTP/CouchDB/RabbitMQ
-is still absent; [the remaining portability checklist](../../docs/ANDROID-SERVER-PORTABILITY.md)
-keeps that end goal explicit.
+This library adapts Android lifecycle to the canonical ECL/Sento runtime.
+Full star-server HTTP/CouchDB/RabbitMQ is still absent;
+[the portability checklist](../../docs/ANDROID-SERVER-PORTABILITY.md) tracks it.
 
 ## Runtime and initialization
 
 - `edge-service` hosts the backend in the app-owned non-exported
-  `:starintel_runtime` process. One process-wide executor owns native boot, requests
-  and stop on the same stable thread, including across Service recreation.
-- `AndroidEclBackend` calls only the supplied `StarIntelEdgeRuntime` JNI binding.
+  `:starintel_runtime` ART process. Its retained pipe worker launches one standalone
+  ECL child; the child's main thread owns native boot, requests and stop.
+- `AndroidEclBackend` uses `OwnedEclNativePort`, never loading ECL into ART.
+  Consumers must extract native libraries with `jniLibs.useLegacyPackaging = true`;
+  the platform native library directory must contain the matching executable runner.
   Missing native libraries are unavailable. ABI mismatch, stale assets, failed
   initialization and failed readiness never become RUNNING. Managed cleanup failure
   is reported honestly, retains owned actor/component handles until confirmed,
@@ -32,7 +30,7 @@ keeps that end goal explicit.
 - Packaged startup source-loads the pinned runtime, then loads **only the fixed
   trusted local init path**. Lisp starts the existing managed Sento actor component
   plus explicitly configured `star.edge.android:*service-components*`.
-- Readiness checks both `runtime.ping` and `service.status`. The latter requires a
+- Readiness checks `runtime.ping`, `service.status` and `actor.roundtrip`. The latter requires a
   running managed actor profile and completed init. It explicitly reports that
   the full server API and Android mesh integration remain unavailable.
 - `service.stop` releases managed components. The C adapter also calls the fixed

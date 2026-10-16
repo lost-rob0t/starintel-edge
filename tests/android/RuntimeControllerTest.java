@@ -140,8 +140,29 @@ public final class RuntimeControllerTest {
             Files.delete(root);
         }
     }
+    private static void childDeath() {
+        ManualExecutor queue = new ManualExecutor();
+        boolean[] alive = {true};
+        AtomicInteger closes = new AtomicInteger();
+        RuntimeController controller = new RuntimeController((c, x) -> new LocalRuntimeBackend.Session() {
+            public boolean isAlive() { return alive[0]; }
+            public void close() { closes.incrementAndGet(); }
+        }, s -> {}, queue);
+        controller.start(CONFIG); queue.run();
+        controller.checkHealth();
+        check(controller.snapshot().state == RuntimeController.State.RUNNING);
+        alive[0] = false;
+        controller.checkHealth(); controller.checkHealth();
+        check(controller.snapshot().state == RuntimeController.State.STOPPING);
+        check(queue.jobs.size() == 1);
+        queue.run();
+        check(controller.snapshot().state == RuntimeController.State.FAILED);
+        check(controller.snapshot().reason == RuntimeController.Reason.RUNTIME_EXITED);
+        check(closes.get() == 1);
+        controller.close();
+    }
     public static void main(String[] args) throws Exception {
-        lifecycle(); failures(); cancelledInFlight(); stableNativeThread(); initFile();
+        childDeath(); lifecycle(); failures(); cancelledInFlight(); stableNativeThread(); initFile();
         System.out.println(checks + " host-JVM lifecycle/init checks passed (fake backends; not ART/APK/Lisp evidence).");
     }
 }
