@@ -1,0 +1,30 @@
+name: Android owned ECL runtime
+on:
+  push:
+    branches: ['android/owned-ecl-runtime-*']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  owned-art:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable disposable emulator KVM
+        run: |
+          sudo chmod 666 /dev/kvm
+      - name: Build matched x86_64 and arm64 native bundles
+        run: nix build --no-update-lock-file .#android-runtime-x86_64 .#android-runtime-arm64-v8a --no-link
+      - name: Offline ART owned-process acceptance (x86_64 emulator only)
+        run: bash tests/android/run_emulator_test.sh
+      - name: Retain execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-ecl-emulator-evidence
+          path: build/owned-art-evidence/
+          if-no-files-found: warn

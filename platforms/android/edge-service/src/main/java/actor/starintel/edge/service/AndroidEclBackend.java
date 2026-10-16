@@ -2,37 +2,34 @@ package actor.starintel.edge.service;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import actor.starintel.edge.StarIntelEdgeRuntime;
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import org.json.JSONObject;
 
-/** Thin platform adapter to the existing pinned ECL runtime. All calls use the owner's one thread. */
+/** ART owns a bounded pipe client; only its standalone child loads ECL. */
 final class AndroidEclBackend implements LocalRuntimeBackend {
     private final EclLifecycle lifecycle;
     AndroidEclBackend(Context context) {
         AssetManager assets = context.getApplicationContext().getAssets();
-        lifecycle = new EclLifecycle(new EclLifecycle.NativePort() {
-            @Override public int abiVersion() { return StarIntelEdgeRuntime.INSTANCE.abiVersion(); }
-            @Override public String start(String directory) { return StarIntelEdgeRuntime.INSTANCE.start(directory); }
-            @Override public boolean localServiceReady() {
-                try {
-                    JSONObject ping = new JSONObject(StarIntelEdgeRuntime.INSTANCE.request("{\"op\":\"runtime.ping\"}"));
-                    JSONObject state = new JSONObject(StarIntelEdgeRuntime.INSTANCE.request("{\"op\":\"service.status\"}"));
-                    return ping.getString("status").equals("ok") && ping.getInt("adapter-abi") == 1
-                            && ping.getString("runtime").equals("starintel-edge")
-                            && state.getString("status").equals("ok") && state.getString("state").equals("running")
-                            && state.getString("profile").equals("local-actors") && state.getString("init").equals("loaded");
-                } catch (Exception malformed) { return false; }
+        File libraries = new File(context.getApplicationInfo().nativeLibraryDir);
+        lifecycle = new EclLifecycle(new OwnedEclNativePort(libraries, new OwnedEclNativePort.Responses() {
+            @Override public boolean ready(String pingText, String stateText, String actorText) throws Exception {
+                JSONObject ping = new JSONObject(pingText);
+                JSONObject state = new JSONObject(stateText);
+                JSONObject actor = new JSONObject(actorText);
+                return ping.getString("status").equals("ok") && ping.getInt("adapter-abi") == 1
+                        && ping.getString("runtime").equals("starintel-edge")
+                        && state.getString("status").equals("ok") && state.getString("state").equals("running")
+                        && state.getString("profile").equals("local-actors") && state.getString("init").equals("loaded")
+                        && actor.getString("status").equals("ok")
+                        && actor.getString("message").equals("android-local");
             }
-            @Override public boolean stopManagedRuntime() {
-                try {
-                    JSONObject result = new JSONObject(StarIntelEdgeRuntime.INSTANCE.request("{\"op\":\"service.stop\"}"));
-                    return result.getString("status").equals("ok") && result.getString("state").equals("stopped");
-                } catch (Exception malformed) { return false; }
+            @Override public boolean stopped(String text) throws Exception {
+                JSONObject result = new JSONObject(text);
+                return result.getString("status").equals("ok") && result.getString("state").equals("stopped");
             }
-            @Override public void stop() { StarIntelEdgeRuntime.INSTANCE.stop(); }
-        }, new RuntimeAssets(new RuntimeAssets.Source() {
+        }), new RuntimeAssets(new RuntimeAssets.Source() {
             @Override public String[] list(String path) throws IOException { return assets.list(path); }
             @Override public InputStream open(String path) throws IOException { return assets.open(path); }
         }));

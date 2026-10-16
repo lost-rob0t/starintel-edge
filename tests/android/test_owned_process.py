@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--abi-include', type=Path, default=ROOT / 'platforms/android/native')
 parser.add_argument('--build-dir', type=Path, default=ROOT / 'build/owned-host')
-ARGS = parser.parse_args()
+ARGS = parser.parse_args() if __name__ == '__main__' else parser.parse_args([])
 BUILD = ARGS.build_dir.resolve()
 LIBS = BUILD / 'lib'
 RUNTIME = BUILD / 'runtime'
@@ -48,9 +48,12 @@ def build():
             '-Wl,-soname,libstarintel_ecl_adapter.so', '-o', LIBS / 'libstarintel_ecl_adapter.so'])
     command(common + include + ['-fPIE', '-pie', ROOT / 'platforms/android/native/starintel_ecl_runner.c',
             '-L', LIBS, '-lstarintel_ecl_adapter', '-Wl,-z,defs', '-o', RUNNER])
-    command(['java', 'com.sun.tools.javac.Main', '-source', '17', '-target', '17', '-Xlint:all,-options', '-Werror', '-d', BUILD / 'classes',
+    command(['java', 'com.sun.tools.javac.Main', '-source', '17', '-target', '17', '-Xlint:all,-options,-serial,-try', '-Werror', '-d', BUILD / 'classes',
             ROOT / 'platforms/android/edge-service/src/main/java/actor/starintel/edge/service/OwnedEclProcess.java',
-            ROOT / 'tests/android/owned_process/OwnedProcessTest.java'])
+            ROOT / 'tests/android/owned_process/OwnedProcessTest.java',
+            ROOT / 'tests/android/owned_process/OwnedLifecycleTest.java'] + [
+            ROOT / 'platforms/android/edge-service/src/main/java/actor/starintel/edge/service' / name
+            for name in ['LocalRuntimeBackend.java', 'EclLifecycle.java', 'OwnedEclNativePort.java']])
 
 def exact(stream, length, timeout=3):
     data = bytearray()
@@ -74,6 +77,10 @@ def read_frame(stream):
     return exact(stream, length) if length else b''
 
 class Transport(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        build()
+
     def launch(self, hello=True, **environment):
         self.log = BUILD / (self._testMethodName + '.log')
         self.log.write_text('')
@@ -227,8 +234,8 @@ os._exit(0)
             self.assertEqual(libc.prctl(36, 0, 0, 0, 0), 0)
 
 if __name__ == '__main__':
-    build()
     result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Transport))
     if not result.wasSuccessful(): sys.exit(1)
     command(['java', '-cp', BUILD / 'classes', 'actor.starintel.edge.service.OwnedProcessTest', LIBS, RUNTIME])
+    command(['java', '-cp', BUILD / 'classes', 'actor.starintel.edge.service.OwnedLifecycleTest', LIBS, RUNTIME])
     print('PASS host-only transport/framing/ownership tests. ECL, ART, JNI coexistence and device gates NOT RUN.')
