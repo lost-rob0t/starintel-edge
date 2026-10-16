@@ -48,7 +48,9 @@ class DiagnosticLifecycle(unittest.TestCase):
                         if (!stale) {
                             if (!AndroidEclBackend.entered.await(2, java.util.concurrent.TimeUnit.SECONDS)) throw new AssertionError("No first startup");
                             new RuntimeDiagnosticActivity().onCreate(new android.os.Bundle());
-                            Thread.sleep(100);
+                            long observed = System.nanoTime() + 2_000_000_000L;
+                            while (System.nanoTime() < observed && android.util.Log.messages.stream().noneMatch(s -> s.startsWith("RECREATED ") || s.startsWith("FAIL "))) Thread.sleep(10);
+                            if (android.util.Log.messages.stream().noneMatch(s -> s.startsWith("RECREATED "))) throw new AssertionError("Recreation was not coalesced: " + android.util.Log.messages);
                             AndroidEclBackend.release.countDown();
                         }
                         long end = System.nanoTime() + 2_000_000_000L;

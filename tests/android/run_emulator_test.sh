@@ -131,7 +131,7 @@ for phase in first restart; do
     adb -s "$serial" shell am start -W -n "$package/actor.starintel.edge.service.RuntimeDiagnosticActivity" \
         --es phase "$phase" > "$evidence/launch-$phase.txt"
     ready=0
-    for _ in $(seq 1 120); do
+    for _ in $(seq 1 300); do
         adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/$phase.log"
         if grep -q "FAIL $phase" "$evidence/$phase.log"; then
             cat "$evidence/$phase.log"

@@ -9,6 +9,9 @@ public final class OwnedEclNativePort implements EclLifecycle.NativePort {
         boolean ready(String ping, String status, String actor) throws Exception;
         boolean stopped(String response) throws Exception;
     }
+    // Packaged ECL/Sento measured 22.2 seconds on API 36 x86_64. Include
+    // bounded cold-load margin; RuntimeOwner also bounds the whole startup.
+    static final long STARTUP_TIMEOUT_MILLIS = 60000;
     private final File libraries;
     private final Responses responses;
     private volatile OwnedEclProcess process;
@@ -27,7 +30,7 @@ public final class OwnedEclNativePort implements EclLifecycle.NativePort {
     @Override public String start(String directory) throws Exception {
         if (attempted) throw new IllegalStateException("Fresh runtime owner required");
         attempted = true;
-        process = OwnedEclProcess.start(libraries, new File(directory), 20000);
+        process = OwnedEclProcess.start(libraries, new File(directory), STARTUP_TIMEOUT_MILLIS);
         return null;
     }
     @Override public boolean localServiceReady() throws Exception {

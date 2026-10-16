@@ -104,3 +104,26 @@ delivery. The test subreaper now retains the pipe endpoints, isolating the
 parent-death signal while still requiring SIGKILL and reaping that exact child.
 The repaired test passed 100 consecutive local executions. All host-only checks
 passed; these do not establish Android ECL or database durability.
+
+
+## Android startup timing and fixture ownership
+
+At `8a2982c`, actual Android Activity recreation preserved one diagnostic worker.
+The host regression reproduces the old fresh-data failure and separately rejects
+truly stale first-phase data. The installed fixture logs one BEGIN per ART process.
+
+At `08e6a45`, production acceptance still failed its 20-second child handshake
+limit. A separately labelled bounded probe in a fresh ART process completed the
+same packaged ECL/Sento startup in **22.213 seconds**. It returned the real
+`android-local` actor roundtrip, running/local-actors/loaded status, acknowledged
+service stop and zero child exit. This probe does not turn the failed acceptance
+run green. Evidence: [run 38966849136](https://github.com/lost-rob0t/starintel-edge/actions/runs/38966849136),
+[APK and logs](https://github.com/lost-rob0t/starintel-edge/actions/runs/38966849136/artifacts/12075557876).
+
+The startup budget is now 60 seconds for the owned child and 120 seconds for the
+whole service startup, including observed 12-25 second private asset extraction.
+Request and stop deadlines remain unchanged. The diagnostic phase allows 300
+seconds for three starts with extraction and two clean stops. These are explicit
+finite budgets, not readiness substitution. A passing exact-head full lifecycle
+run is still required. File-sentinel preservation remains distinct from actual
+LMDB/outbox crash durability and actor-state restoration.
