@@ -206,22 +206,31 @@ class Transport(unittest.TestCase):
         # Process-local Linux test adoption lets us reap the exact owned grandchild.
         libc = ctypes.CDLL(None, use_errno=True)
         self.assertEqual(libc.prctl(36, 1, 0, 0, 0), 0)  # PR_SET_CHILD_SUBREAPER
+        # Keep the input writer/output reader alive in this subreaper, so EOF
+        # cannot race PDEATHSIG and turn the expected SIGKILL into a clean exit.
+        input_read, input_write = os.pipe()
+        output_read, output_write = os.pipe()
         script = '''import os,subprocess,sys,struct
-p=subprocess.Popen(sys.argv[1:],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-n=struct.unpack('>I',p.stdout.read(4))[0]
-assert p.stdout.read(n)==b'{"transport":"starintel-owned/1","abi":1}'
+input_read,output_write,output_read=map(int,sys.argv[1:4])
+p=subprocess.Popen(sys.argv[4:],stdin=input_read,stdout=output_write,stderr=subprocess.DEVNULL)
+with os.fdopen(output_read,'rb') as response:
+    n=struct.unpack('>I',response.read(4))[0]
+    assert response.read(n)==b'{"transport":"starintel-owned/1","abi":1}'
 print(p.pid,flush=True)
 os._exit(0)
 '''
         pid = None
         try:
-            result = subprocess.run([sys.executable, '-c', script, str(RUNNER), str(RUNTIME)],
+            result = subprocess.run([sys.executable, '-c', script, str(input_read), str(output_write),
+                                     str(output_read), str(RUNNER), str(RUNTIME)],
+                                    pass_fds=(input_read, output_write, output_read),
                                     env=ENV, capture_output=True, check=True, timeout=4)
             pid = int(result.stdout)
             end = time.monotonic() + 3
             while time.monotonic() < end:
                 exited, status = os.waitpid(pid, os.WNOHANG)
                 if exited:
+                    pid = None  # Already reaped, including when an assertion fails.
                     self.assertTrue(os.WIFSIGNALED(status))
                     self.assertEqual(os.WTERMSIG(status), signal.SIGKILL)
                     pid = None
@@ -229,6 +238,8 @@ os._exit(0)
                 time.sleep(.01)
             self.assertIsNone(pid, 'owned child did not exit after creator parent died')
         finally:
+            for descriptor in (input_read, input_write, output_read, output_write):
+                os.close(descriptor)
             if pid is not None:
                 os.kill(pid, signal.SIGKILL); os.waitpid(pid, 0)
             self.assertEqual(libc.prctl(36, 0, 0, 0, 0), 0)

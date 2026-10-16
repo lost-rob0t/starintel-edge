@@ -88,3 +88,19 @@ ports is implemented by a local actor ping. In order:
 
 No WearOS source/pin or PR #120 branch is modified. Full server API still reports
 unavailable; no phone, host, live collection, credentials or services are deployed.
+
+## Verification harness repair
+
+The e9ef934 Android run stopped before ADB connected. Subsequent inspection of
+its retained emulator log identified `FATAL: Broken AVD system path`: inherited
+CI `ANDROID_HOME` selected the hosted SDK while `ANDROID_SDK_ROOT` selected Nix.
+Both now select the flake SDK, and the harness checks image files, observes its
+own emulator job during boot, emits emulator diagnostics and retains the signed
+APK even when boot fails. This repair itself is not evidence of ART startup.
+
+The host parent-death test had an independent EOF/SIGKILL race: parent exit closed
+its pipe writer, permitting the runner's valid clean-EOF shutdown before signal
+delivery. The test subreaper now retains the pipe endpoints, isolating the
+parent-death signal while still requiring SIGKILL and reaping that exact child.
+The repaired test passed 100 consecutive local executions. All host-only checks
+passed; these do not establish Android ECL or database durability.

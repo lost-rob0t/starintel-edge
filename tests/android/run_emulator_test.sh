@@ -8,6 +8,19 @@ if [ "${STARINTEL_ANDROID_TEST_IN_SHELL:-}" != 1 ]; then
         nix develop --no-update-lock-file .#android-runtime -c bash "$0" "$@"
 fi
 
+# CI images may export ANDROID_HOME for a different SDK. Use only the flake SDK.
+: "${ANDROID_SDK_ROOT:?android-runtime shell must provide its SDK}"
+export ANDROID_HOME="$ANDROID_SDK_ROOT"
+export PATH="$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator:$PATH"
+system_image="$ANDROID_SDK_ROOT/system-images/android-36/google_apis/x86_64"
+for required in system.img vendor.img ramdisk.img kernel-ranchu; do
+    if [ ! -s "$system_image/$required" ]; then
+        printf 'Missing emulator image file: %s/%s\n' "$system_image" "$required" >&2
+        exit 1
+    fi
+done
+printf 'Android SDK: %s\nSystem image: %s\n' "$ANDROID_HOME" "$system_image"
+
 port=${STARINTEL_ANDROID_EMULATOR_PORT:-5584}
 serial="emulator-$port"
 test_root=$(mktemp -d /tmp/starintel-edge-emulator-test.XXXXXX)
@@ -22,6 +35,7 @@ cleanup() {
     if [ -n "$emulator_pid" ]; then
         timeout 10 adb -s "$serial" logcat -d > "$evidence/logcat-final.txt" 2>&1 || true
         cp "$test_root/emulator.log" "$evidence/emulator.log" || true
+        tail -n 100 "$test_root/emulator.log" || true
         timeout 10 adb -s "$serial" emu kill >/dev/null 2>&1 || true
         # Only the emulator still tracked as our own active shell job. ADB may
         # never connect during a failed boot, so it cannot be the sole cleanup path.
@@ -69,15 +83,24 @@ keytool -genkeypair -keystore "$keystore" -storepass android \
 bundle_output=$(nix build --no-update-lock-file .#android-runtime-x86_64 --no-link --print-out-paths)
 python3 tests/android/verify_owned_apk.py "$signed_apk" "$bundle_output" > "$evidence/packaged-bytes.json"
 
+cp "$signed_apk" "$evidence/owned-runtime-diagnostic.apk"
+sha256sum "$evidence/owned-runtime-diagnostic.apk" > "$evidence/apk.sha256"
+cat "$avd_home/starintel_edge_runtime.avd/config.ini" > "$evidence/avd-config.ini"
+printf 'ANDROID_HOME=%s\nANDROID_SDK_ROOT=%s\n' "$ANDROID_HOME" "$ANDROID_SDK_ROOT" > "$evidence/sdk.txt"
+
 emulator -avd starintel_edge_runtime -port "$port" \
     -no-window -no-snapshot -wipe-data -no-audio -no-boot-anim \
     -gpu swiftshader_indirect >"$test_root/emulator.log" 2>&1 &
 emulator_pid=$!
 
-timeout 180 adb -s "$serial" wait-for-device
 booted=0
-for _ in $(seq 1 120); do
-    if [ "$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; then
+boot_deadline=$((SECONDS + 300))
+while [ "$SECONDS" -lt "$boot_deadline" ]; do
+    if ! jobs -pr | grep -qx "$emulator_pid"; then
+        echo 'Owned emulator exited before boot completed' >&2
+        exit 1
+    fi
+    if [ "$(timeout 5 adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)" = 1 ]; then
         booted=1
         break
     fi
@@ -90,8 +113,6 @@ adb -s "$serial" install -r "$signed_apk"
 adb -s "$serial" shell svc wifi disable
 adb -s "$serial" shell svc data disable
 package=actor.starintel.edge.diagnostic
-cp "$signed_apk" "$evidence/owned-runtime-diagnostic.apk"
-sha256sum "$evidence/owned-runtime-diagnostic.apk" > "$evidence/apk.sha256"
 adb -s "$serial" shell getprop > "$evidence/emulator-properties.txt"
 if adb -s "$serial" shell dumpsys package "$package" | grep -q android.permission.INTERNET; then
     echo 'Diagnostic APK unexpectedly requests Internet permission' >&2

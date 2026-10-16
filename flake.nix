@@ -641,6 +641,7 @@
           android-runtime = p.pkgs.mkShell {
             packages = [ p.pkgs.jdk17 p.android.androidsdk ];
             ANDROID_SDK_ROOT = "${p.android.androidsdk}/libexec/android-sdk";
+            ANDROID_HOME = "${p.android.androidsdk}/libexec/android-sdk";
           };
           default = p.pkgs.mkShell ({
             packages = [ p.installer p.edgeIngest ]
@@ -655,6 +656,7 @@
             ];
           } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
             ANDROID_SDK_ROOT = "${p.android.androidsdk}/libexec/android-sdk";
+            ANDROID_HOME = "${p.android.androidsdk}/libexec/android-sdk";
             STARINTEL_ANDROID_NDK = "${p.android.ndk-bundle}/libexec/android-sdk/ndk/28.2.13676358";
           });
         });
