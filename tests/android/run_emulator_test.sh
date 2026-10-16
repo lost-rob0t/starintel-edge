@@ -61,6 +61,9 @@ keytool -genkeypair -keystore "$keystore" -storepass android \
     --ks "$keystore" --ks-pass pass:android --key-pass pass:android \
     --out "$signed_apk" "$unsigned_apk"
 
+bundle_output=$(nix build --no-update-lock-file .#android-runtime-x86_64 --no-link --print-out-paths)
+python3 tests/android/verify_owned_apk.py "$signed_apk" "$bundle_output" > "$evidence/packaged-bytes.json"
+
 emulator -avd starintel_edge_runtime -port "$port" \
     -no-window -no-snapshot -wipe-data -no-audio -no-boot-anim \
     -gpu swiftshader_indirect >"$test_root/emulator.log" 2>&1 &
