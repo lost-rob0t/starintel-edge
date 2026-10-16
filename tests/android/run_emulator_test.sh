@@ -20,9 +20,14 @@ git rev-parse HEAD > "$evidence/source-revision.txt"
 
 cleanup() {
     if [ -n "$emulator_pid" ]; then
-        adb -s "$serial" logcat -d > "$evidence/logcat-final.txt" 2>&1 || true
+        timeout 10 adb -s "$serial" logcat -d > "$evidence/logcat-final.txt" 2>&1 || true
         cp "$test_root/emulator.log" "$evidence/emulator.log" || true
-        adb -s "$serial" emu kill >/dev/null 2>&1 || true
+        timeout 10 adb -s "$serial" emu kill >/dev/null 2>&1 || true
+        # Only the emulator still tracked as our own active shell job. ADB may
+        # never connect during a failed boot, so it cannot be the sole cleanup path.
+        if jobs -pr | grep -qx "$emulator_pid"; then
+            kill -KILL "$emulator_pid" 2>/dev/null || true
+        fi
         wait "$emulator_pid" 2>/dev/null || true
     fi
     case "$test_root" in
@@ -85,7 +90,8 @@ adb -s "$serial" install -r "$signed_apk"
 adb -s "$serial" shell svc wifi disable
 adb -s "$serial" shell svc data disable
 package=actor.starintel.edge.diagnostic
-sha256sum "$signed_apk" > "$evidence/apk.sha256"
+cp "$signed_apk" "$evidence/owned-runtime-diagnostic.apk"
+sha256sum "$evidence/owned-runtime-diagnostic.apk" > "$evidence/apk.sha256"
 adb -s "$serial" shell getprop > "$evidence/emulator-properties.txt"
 if adb -s "$serial" shell dumpsys package "$package" | grep -q android.permission.INTERNET; then
     echo 'Diagnostic APK unexpectedly requests Internet permission' >&2
@@ -111,6 +117,7 @@ for phase in first restart; do
     [[ "$parent" =~ ^[0-9]+$ ]]
     child=$(awk -v p="$parent" '$2 == p && /libstarintel_ecl_runner.so/ {print $1}' "$evidence/processes-$phase.txt")
     [[ "$child" =~ ^[0-9]+$ ]]
+    adb -s "$serial" shell run-as "$package" kill -0 "$child"
     adb -s "$serial" shell run-as "$package" kill -9 "$parent"
     retired=0
     for _ in $(seq 1 30); do
