@@ -34,6 +34,11 @@ git rev-parse HEAD > "$evidence/source-revision.txt"
 cleanup() {
     if [ -n "$emulator_pid" ]; then
         timeout 10 adb -s "$serial" logcat -d > "$evidence/logcat-final.txt" 2>&1 || true
+        # Synthetic diagnostic APK only: expose native startup/crash diagnostics
+        # in CI too, since archive downloads may be unavailable to reviewers.
+        timeout 10 adb -s "$serial" logcat -d -s StarIntelEdgeRuntime:V libc:F DEBUG:F \
+            '*:S' > "$evidence/native-errors.txt" 2>&1 || true
+        cat "$evidence/native-errors.txt"
         cp "$test_root/emulator.log" "$evidence/emulator.log" || true
         tail -n 100 "$test_root/emulator.log" || true
         timeout 10 adb -s "$serial" emu kill >/dev/null 2>&1 || true
@@ -124,7 +129,7 @@ for phase in first restart; do
         --es phase "$phase" > "$evidence/launch-$phase.txt"
     ready=0
     for _ in $(seq 1 120); do
-        adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I '*:S' > "$evidence/$phase.log"
+        adb -s "$serial" logcat -d -s StarIntelEdgeDiagnostic:I StarIntelEdgeRuntime:V '*:S' > "$evidence/$phase.log"
         if grep -q "FAIL $phase" "$evidence/$phase.log"; then cat "$evidence/$phase.log"; exit 1; fi
         if grep -q "HOLD $phase" "$evidence/$phase.log"; then ready=1; break; fi
         sleep 1
