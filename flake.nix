@@ -435,12 +435,12 @@
             pname = "starintel-edge-runtime-diagnostic";
             version = "0.1.0";
             src = self;
-            nativeBuildInputs = [ pkgs.jdk17 pkgs.kotlin pkgs.zip ];
+            nativeBuildInputs = [ pkgs.jdk17 pkgs.zip ];
             dontConfigure = true;
             buildPhase = ''
               runHook preBuild
               mkdir -p classes dex package/lib/x86_64 package/assets
-              javac --release 17 -classpath ${androidJar} -d classes \
+              javac -encoding UTF-8 --release 17 -classpath ${androidJar} -d classes \
                 platforms/android/edge-service/src/main/java/actor/starintel/edge/service/{LocalRuntimeBackend,EclLifecycle,RuntimeAssets,OwnedEclProcess,OwnedEclNativePort,AndroidEclBackend}.java \
                 tests/android/diagnostic/RuntimeDiagnosticActivity.java
               jar --create --file diagnostic.jar -C classes .

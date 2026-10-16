@@ -43,6 +43,11 @@ No local real-ECL, Lisp, Kotlin facade, APK, emulator or physical-device result 
 claimed. Shell `gh auth status` rejects its token; the GitHub connector is used
 for PR publication/status where necessary. Git transport is checked separately.
 
+First CI attempt at `525b672` built both native ABI bundles successfully
+([run 38939095178](https://github.com/lost-rob0t/starintel-edge/actions/runs/38939095178)),
+then failed compiling the diagnostic Java source under Nix's US-ASCII locale.
+The build now explicitly uses UTF-8. No emulator was launched in that attempt.
+
 The `Android owned ECL runtime` workflow builds matched x86_64/arm64 bundles,
 then installs an ephemeral diagnostic APK on one disposable API 36 x86_64 AVD.
 It uses the production Android backend, without INTERNET permission, performs
