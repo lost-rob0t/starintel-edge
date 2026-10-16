@@ -11,7 +11,12 @@ ABI handshake, ping, managed local-actors readiness and real Sento roundtrip.
 Stopping checks the Lisp response, transport acknowledgement and zero child exit.
 The existing service process watchdog remains conservative: after any boot attempt
 it retires the exact service process, including on unconfirmed child retirement.
-No implicit retry, automatic restart or alternate Lisp evaluator is introduced.
+A nonblocking one-second child-liveness observation removes RUNNING after an
+unexpected child exit; cleanup retains the existing watchdog ownership rules.
+The controller regression failed with stale RUNNING before this repair and passes
+afterward. Host transport tests also kill the exact owned C-stub child and observe
+its death without issuing another request. No implicit retry, automatic restart
+or alternate Lisp evaluator is introduced.
 
 Both native ABI bundles build/hash the PIE runner alongside the matching adapter.
 APK consumers must use extracted native libraries (`jniLibs.useLegacyPackaging =
@@ -26,9 +31,9 @@ Local execution on October 16, 2026:
 
 - `python3 tools/check_contracts.py`: 8 scaffold contracts passed.
 - `python3 tests/android/test_owned_process.py --build-dir build/owned-host`:
-  13 native framing tests, 79 Java ownership assertions and 18 new lifecycle
+  13 native framing tests, 84 Java ownership assertions and 20 new lifecycle
   integration assertions passed. **Host C stub only, no ECL/ART evidence.**
-- `bash tools/test_android_host.sh`: 166 controller/init and 57 orchestration
+- `bash tools/test_android_host.sh`: 172 controller/init and 57 orchestration
   assertions passed; Python discovery passes after repairing import-time argument
   parsing. JNI header-dependent test is separately skipped in this workspace.
 - `bash -n tests/android/run_emulator_test.sh` and `git diff --check` passed.
@@ -54,7 +59,13 @@ canonical server persistence. Those gates remain open.
 
 ## Remaining canonical server slices
 
-`docs/ANDROID-SERVER-PORTABILITY.md` remains authoritative. In order:
+`docs/ANDROID-SERVER-PORTABILITY.md` remains authoritative. Rechecked against
+canonical server `0137ead90ab9560b5a5090f0b62c1b59aac08c68`:
+`source/starintel-gserver.asd` requires the full HTTP/auth/storage/broker closure;
+`source/databases/couchdb.lisp:44` uses `sb-mop`,
+`source/lease-store-runtime.lisp:17` uses `sb-ext:get-time-of-day`, and
+`source/leases/valkey-store.lisp:215` uses `sb-sys:with-deadline`. None of these
+ports is implemented by a local actor ping. In order:
 
 1. Pass this standalone ART/ECL startup and lifecycle gate; verify production
    foreground-service lifecycle/notification denial and exact packaged bytes too.

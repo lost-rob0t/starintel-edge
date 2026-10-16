@@ -35,7 +35,9 @@ public final class OwnedLifecycleTest {
             EclLifecycle lifecycle = new EclLifecycle(port, (path, cancel) -> cancel.check());
             if (accept) {
                 LocalRuntimeBackend.Session session = lifecycle.open(config, new LocalRuntimeBackend.Cancellation());
+                check(session.isAlive());
                 session.close(); session.close();
+                check(!session.isAlive());
             } else {
                 try { lifecycle.open(config, new LocalRuntimeBackend.Cancellation()); throw new AssertionError(); }
                 catch (IllegalStateException expected) { check(expected.getMessage().contains("not ready")); }

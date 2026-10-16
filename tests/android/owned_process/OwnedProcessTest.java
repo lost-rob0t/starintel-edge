@@ -247,10 +247,22 @@ public final class OwnedProcessTest {
         fails(IOException.class, () -> badExit.close(1000), "nonzero exit after stop ack");
         ok(badExit.awaitRetirement(1000), "nonzero exit cleanup");
     }
+    private static void unexpectedChildExit() throws Exception {
+        AtomicReference<Process> child = new AtomicReference<>();
+        OwnedEclProcess client = new OwnedEclProcess(() -> {
+            Process process = launch(); child.set(process); return process;
+        }, 2000);
+        ok(client.isAlive(), "owned child initially alive");
+        child.get().destroyForcibly();
+        untilDead(child.get(), "exact test child killed");
+        ok(!client.isAlive(), "dead child cannot remain live without a pipe request");
+        fails(IOException.class, () -> client.close(1000), "unexpected exit is not graceful stop");
+        ok(client.awaitRetirement(1000), "dead child cleanup observed");
+    }
     public static void main(String[] args) throws Exception {
         libraries = new File(args[0]).getCanonicalFile(); runtime = new File(args[1]).getCanonicalFile();
         Files.createDirectories(runtime.toPath());
-        unicodeAndBounds(); malformedResponses(); deadlinesAndAdmission(); retainedCreatorAndShutdown(); noExpiredDispatch(); nativeForcedRetirementHostOnly(); blockingDestroyDoesNotBlockObservation();
+        unexpectedChildExit(); unicodeAndBounds(); malformedResponses(); deadlinesAndAdmission(); retainedCreatorAndShutdown(); noExpiredDispatch(); nativeForcedRetirementHostOnly(); blockingDestroyDoesNotBlockObservation();
         System.out.println("PASS " + checks + " host JVM/C-ABI-STUB transport assertions; NO ECL/ART proof");
     }
 }

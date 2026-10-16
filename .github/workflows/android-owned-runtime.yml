@@ -1,7 +1,5 @@
 name: Android owned ECL runtime
 on:
-  push:
-    branches: ['android/owned-ecl-runtime-*']
   pull_request:
 permissions:
   contents: read
@@ -14,6 +12,8 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Host controller and owned lifecycle checks (not ART)
+        run: bash tools/test_android_host.sh
       - name: Enable disposable emulator KVM
         run: |
           sudo chmod 666 /dev/kvm

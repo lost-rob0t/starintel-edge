@@ -14,6 +14,8 @@ public interface LocalRuntimeBackend {
     default boolean requiresFreshProcess() { return false; }
 
     interface Session extends AutoCloseable {
+        /** Nonblocking resource-liveness observation, not an actor health probe. */
+        default boolean isAlive() { return true; }
         /** Bounded and idempotent; releases all owned listeners/threads. */
         @Override void close() throws Exception;
     }

@@ -11,12 +11,13 @@ public final class OwnedEclNativePort implements EclLifecycle.NativePort {
     }
     private final File libraries;
     private final Responses responses;
-    private OwnedEclProcess process;
+    private volatile OwnedEclProcess process;
     private boolean attempted;
     public OwnedEclNativePort(File libraries, Responses responses) {
         this.libraries = libraries;
         this.responses = responses;
     }
+    @Override public boolean isAlive() { return process != null && process.isAlive(); }
     @Override public int abiVersion() throws LocalRuntimeBackend.Unavailable {
         if (!new File(libraries, "libstarintel_ecl_runner.so").canExecute())
             throw new LocalRuntimeBackend.Unavailable();

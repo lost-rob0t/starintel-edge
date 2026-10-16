@@ -45,6 +45,15 @@ final class RuntimeOwner {
                 };
                 main.postDelayed(timeout, snapshot.state == RuntimeController.State.STARTING ? 30000 : 10000);
             }
+            if (snapshot.state == RuntimeController.State.RUNNING) {
+                main.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        if (snapshot != controller.snapshot()) return;
+                        controller.checkHealth();
+                        if (snapshot == controller.snapshot()) main.postDelayed(this, 1000);
+                    }
+                }, 1000);
+            }
             if (listener != null) listener.accept(snapshot);
             if (!snapshot.active() && controller.requiresFreshProcess() && !retiring) {
                 retiring = true;
